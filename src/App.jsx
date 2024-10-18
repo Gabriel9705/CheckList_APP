@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import lista from "./json/ListaSistemas.json";
 
 const App = () => {
   const [checklists, setChecklists] = useState({
@@ -22,10 +21,12 @@ const App = () => {
 
   const [checklistAtual, setChecklistAtual] = useState('Crediário');
   const [subchecklistAtual, setSubchecklistAtual] = useState('SubCrediário 1');
+  
   const [testes, setTestes] = useState([
     { id: 1, nome: 'Teste 1', resultado: 'Não Testado', observacao: '' },
     { id: 2, nome: 'Teste 2', resultado: 'Não Testado', observacao: '' },
   ]);
+
   const [novoTeste, setNovoTeste] = useState('');
   const [nomeTecnico, setNomeTecnico] = useState('');
   const [novoChecklist, setNovoChecklist] = useState('');
