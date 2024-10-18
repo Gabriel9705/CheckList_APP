@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import jsPDF from "jspdf";
-//import emailjs from 'emailjs-com';
+import jsPDF from 'jspdf';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import lista from "./json/ListaSistemas.json";
 
 const App = () => {
-  const initialChecklists = {
+  const [checklists, setChecklists] = useState({
     'Crediário': {
       subchecklists: {
         'SubCrediário 1': [
@@ -17,47 +18,39 @@ const App = () => {
         ],
       },
     },
-    // Adicione mais checklists conforme necessário
-  };
+  });
 
-  const [checklists, setChecklists] = useState(initialChecklists);
   const [checklistAtual, setChecklistAtual] = useState('Crediário');
   const [subchecklistAtual, setSubchecklistAtual] = useState('SubCrediário 1');
-  const [testes, setTestes] = useState(checklists['Crediário'].subchecklists['SubCrediário 1']);
+  const [testes, setTestes] = useState([
+    { id: 1, nome: 'Teste 1', resultado: 'Não Testado', observacao: '' },
+    { id: 2, nome: 'Teste 2', resultado: 'Não Testado', observacao: '' },
+  ]);
   const [novoTeste, setNovoTeste] = useState('');
   const [nomeTecnico, setNomeTecnico] = useState('');
-  const [modoDark, setModoDark] = useState(false); // Estado para o modo dark
+  const [novoChecklist, setNovoChecklist] = useState('');
+  const [novoSubchecklist, setNovoSubchecklist] = useState('');
+  const [modoDark, setModoDark] = useState(false);
 
-  const toggleModoDark = () => {
-    setModoDark(!modoDark);
-  };
-
-  // Efeito para adicionar ou remover a classe dark-mode no body
   useEffect(() => {
-    if (modoDark) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
+    document.body.classList.toggle('dark-mode', modoDark);
   }, [modoDark]);
 
+  const toggleModoDark = () => {
+    setModoDark((prevModoDark) => !prevModoDark);
+  };
+
   const handleChange = (id, e) => {
-    const novosTestes = testes.map((teste) => {
-      if (teste.id === id) {
-        return { ...teste, resultado: e.target.value };
-      }
-      return teste;
-    });
+    const novosTestes = testes.map((teste) =>
+      teste.id === id ? { ...teste, resultado: e.target.value } : teste
+    );
     setTestes(novosTestes);
   };
 
   const handleObservationChange = (id, e) => {
-    const novosTestes = testes.map((teste) => {
-      if (teste.id === id) {
-        return { ...teste, observacao: e.target.value };
-      }
-      return teste;
-    });
+    const novosTestes = testes.map((teste) =>
+      teste.id === id ? { ...teste, observacao: e.target.value } : teste
+    );
     setTestes(novosTestes);
   };
 
@@ -74,12 +67,10 @@ const App = () => {
       progressoTotal: (progressoTotal * 100).toFixed(2),
       passouPercent: (passouPercent * 100).toFixed(2),
       naoPassouPercent: (naoPassouPercent * 100).toFixed(2),
-      totalPassou,          // Adicionado totalPassou
-      totalNaoPassou,      // Adicionado totalNaoPassou
+      totalPassou,
+      totalNaoPassou,
     };
   };
-
-  const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
 
   const handleSelectChange = (e) => {
     const checklistSelecionado = e.target.value;
@@ -97,7 +88,7 @@ const App = () => {
   const adicionarTeste = () => {
     if (novoTeste.trim() === '') return;
     const novoTesteObj = { id: Date.now(), nome: novoTeste, resultado: 'Não Testado', observacao: '' };
-    setTestes([...testes, novoTesteObj]);
+    setTestes((prevTestes) => [...prevTestes, novoTesteObj]);
     setNovoTeste('');
   };
 
@@ -109,6 +100,32 @@ const App = () => {
   const resetarTestes = () => {
     const novosTestes = testes.map(teste => ({ ...teste, resultado: 'Não Testado', observacao: '' }));
     setTestes(novosTestes);
+  };
+
+  const adicionarChecklist = () => {
+    if (novoChecklist.trim() === '') return;
+    setChecklists((prevChecklists) => ({
+      ...prevChecklists,
+      [novoChecklist]: { subchecklists: {} },
+    }));
+    setChecklistAtual(novoChecklist);
+    setNovoChecklist('');
+  };
+
+  const adicionarSubChecklist = () => {
+    if (novoSubchecklist.trim() === '') return;
+    setChecklists((prevChecklists) => ({
+      ...prevChecklists,
+      [checklistAtual]: {
+        ...prevChecklists[checklistAtual],
+        subchecklists: {
+          ...prevChecklists[checklistAtual].subchecklists,
+          [novoSubchecklist]: [],
+        },
+      },
+    }));
+    setSubchecklistAtual(novoSubchecklist);
+    setNovoSubchecklist('');
   };
 
   const enviarEmailComPDF = () => {
@@ -123,6 +140,8 @@ const App = () => {
     doc.save('checklist.pdf');
     // Implementar envio de email aqui com emailjs
   };
+
+  const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
 
   return (
     <div className={`container ${modoDark ? 'dark-mode' : ''}`}>
@@ -232,9 +251,9 @@ const App = () => {
       </div>
 
       <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
-      <button className="btn btn-success mt-2" onClick={enviarEmailComPDF}>Enviar PDF</button>
+      <button className="btn btn-success mt-2" onClick={enviarEmailComPDF}>Gerar PDF</button>
     </div>
   );
-};
+}
 
 export default App;
