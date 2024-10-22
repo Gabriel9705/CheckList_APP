@@ -26,7 +26,7 @@ const AddSubGrupo = () => {
                     name={"subGrupo"}
                     register={register}
                 />
-                <button type="submit" className="btn btn-primary mt-2">Criar Novo SubChecklist</button>
+                <button type="submit" className="btn btn-primary mt-2">Criar Tipo de modulo</button>
             </div>
         </form>
     )
