@@ -182,7 +182,7 @@ const ListaDeTestes = () => {
                     ))}
                 </tbody>
             </table>
-
+            {/*Teste */}
             <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
             <button className="btn btn-success mt-2 PDF space" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
