@@ -97,7 +97,7 @@ const ListaDeTestes = () => {
             <table className="table table-bordered mt-3">
                 <thead>
                     <tr>
-                        <th>Teste</th>
+                        <th>Casos de Uso!</th>
                         <th>Resultado</th>
                         <th>Observação</th>
                         <th>Ação</th>
@@ -132,7 +132,7 @@ const ListaDeTestes = () => {
             </table>
 
             <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
-            <button className="btn btn-success mt-2" onClick={enviarEmailComPDF}>Gerar PDF</button>
+            <button className="btn btn-success mt-2 PDF space" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
     )
 };
