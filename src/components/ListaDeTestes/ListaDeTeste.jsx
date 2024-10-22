@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
 import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/listaTestes";
-import { Alert } from "bootstrap";
 
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
@@ -67,15 +66,19 @@ const ListaDeTestes = () => {
     };
 
     //Fucção para Grava o teste no BD
-    const gravarTeste = async (id) =>{
-        try{
-            await adicionarTesteNoBanco('')
-            //caso precise chamar a API
-            setAtualizar(true);// Alerta quando o teste estiver finaliza 
-        }catch (error) { if(teste._id === "Não Testado" ){
-            Alert(`TEC ${nomeTecnico} TESTE NÃO FOI FINALIZADO !!`)
-            console.error("Erro ao gravar teste:", error);
-        }
+    const gravarTeste = async (id, resultado, observacao) => {
+        try {
+            if (resultado === "Não Testado" || resultado === undefined) {
+                alert(`TEC ${nomeTecnico} TESTE NÃO FOI FINALIZADO !!`)
+                return;
+            }
+            const data = { resultado, observacao };
+            console.log(id, data)
+            await updateTeste(id, data)
+            setAtualizar(true);// Alerta quando o teste estiver finaliza
+
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -103,7 +106,7 @@ const ListaDeTestes = () => {
         doc.text(`Técnico: ${nomeTecnico}`, 10, 20);
 
         testes.forEach((teste, index) => {
-            doc.text(`${index + 1}. ${teste.description} - Resultado: ${teste.resultado} - Observação: ${teste.observacao}`, 10, 30 + index * 10);
+            doc.text(`${index + 1}. ${teste.tecnico}- ${teste.description} - Resultado: ${teste.resultado} - Observação: ${teste.observacao}`, 10, 30 + index * 10);
         });
 
         doc.save('checklist.pdf');
@@ -129,16 +132,15 @@ const ListaDeTestes = () => {
         <>
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
-                <div className="progress">
-                    <div className="progress-bar progressPassou" role="progressbar" style={{ width: `${passouPercent}%` }} aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
-                        {passouPercent}%
-                    </div>
+
+                <div className="progress" role="progressbar" aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
+                    <div className="progress-bar bg-success" style={{ width: `${passouPercent}%` }}>{passouPercent}%</div>
                 </div>
-                <div className="progress">
-                    <div className="progress-bar progressNaoPassou" role="progressbar" style={{ width: `${naoPassouPercent}%` }} aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
-                        {naoPassouPercent}%
-                    </div>
+
+                <div className="progress" role="progressbar" aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
+                    <div className="progress-bar bg-danger" style={{ width: `${naoPassouPercent}%` }}>{naoPassouPercent}%</div>
                 </div>
+
                 <p>Total de Testes: {testes.length}</p>
                 <p>Testes que Passaram: {totalPassou} ({passouPercent}%)</p>
                 <p>Testes que Não Passaram: {totalNaoPassou} ({naoPassouPercent}%)</p>
@@ -155,11 +157,12 @@ const ListaDeTestes = () => {
                 </thead>
                 <tbody>
                     {testes.map((teste) => (
-                        <tr key={teste._id}>
+                        <tr key={teste._id} >
                             <td>{teste.description}</td>
                             <td>
                                 <select className="form-control" value={teste.resultado}
-                                    onChange={(e) => handleChange(teste._id, e)}>
+                                    onChange={(e) => handleChange(teste._id, e)}
+                                >
                                     <option value="Não Testado">Não Testado</option>
                                     <option value="Passou">Passou</option>
                                     <option value="Não Passou">Não Passou</option>
@@ -175,16 +178,17 @@ const ListaDeTestes = () => {
                                 />
                             </td>
                             <td>
-                                <button className="btn btn-danger" onClick={() => excluirTeste(teste._id)}>Excluir</button>
-                                <button className="btn btn-success" onClick={()=> gravarTeste(teste.id)} >Gravar</button>
+                                <button className="btn btn-danger space" onClick={() => excluirTeste(teste._id)}>Excluir</button>
+                                <button className="btn btn-success"
+                                    onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)} >Gravar</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
             {/*Teste */}
-            <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
-            <button className="btn btn-success mt-2 PDF space" onClick={enviarEmailComPDF}>Gerar PDF</button>
+            <button className="btn btn-warning mt-2 space" onClick={resetarTestes}>Resetar Testes</button>
+            <button className="btn btn-success mt-2 PDF" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
     );
 };

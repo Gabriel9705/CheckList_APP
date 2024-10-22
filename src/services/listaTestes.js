@@ -27,7 +27,11 @@ export function postSubGrupo(body) {
     return response;
 };
 
-export function postTeste(body) {
+export function postTeste(data) {
+    const body = {
+        ...data,
+        resultado: "Não Testado"
+    }
     const response = axios.post(`${baseURL}/test/created`, body)
     return response;
 };
@@ -37,7 +41,7 @@ export function deleteTeste(id) {
     return response;
 };
 
-export function updateTeste(body, id) {
-    const response = axios.patch(`${baseURL}/test/updated/${id}`, body)
+export function updateTeste(id, body) {
+    const response = axios.patch(`${baseURL}/test/update/${id}`, body)
     return response;
 };
