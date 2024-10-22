@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
 import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/listaTestes";
+import { Alert } from "bootstrap";
 
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
@@ -64,6 +65,19 @@ const ListaDeTestes = () => {
             totalNaoPassou,
         };
     };
+
+    //Fucção para Grava o teste no BD
+    const gravarTeste = async (id) =>{
+        try{
+            await adicionarTesteNoBanco('')
+            //caso precise chamar a API
+            setAtualizar(true);// Alerta quando o teste estiver finaliza 
+        }catch (error) { if(teste._id === "Não Testado" ){
+            Alert(`TEC ${nomeTecnico} TESTE NÃO FOI FINALIZADO !!`)
+            console.error("Erro ao gravar teste:", error);
+        }
+        }
+    }
 
     // Função para excluir um teste
     const excluirTeste = async (id) => {
@@ -162,6 +176,7 @@ const ListaDeTestes = () => {
                             </td>
                             <td>
                                 <button className="btn btn-danger" onClick={() => excluirTeste(teste._id)}>Excluir</button>
+                                <button className="btn btn-success" onClick={()=> gravarTeste(teste.id)} >Gravar</button>
                             </td>
                         </tr>
                     ))}
