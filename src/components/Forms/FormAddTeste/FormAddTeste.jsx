@@ -12,7 +12,7 @@ const FormAddTeste = () => {
     const [novoSubchecklist, setNovoSubchecklist] = useState('');
     const [nomeTecnico, setNomeTecnico] = useState('');
 
-    const { register, handleSubmit,reset, formState: { errors }, setValue } = useForm({
+    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
         // resolver: zodResolver(gameSchema)
     });
 
@@ -20,7 +20,7 @@ const FormAddTeste = () => {
         try {
             console.log(data);
             await postTeste(data);
-            reset()
+            reset();
         } catch (error) {
             console.log(error)
         }
