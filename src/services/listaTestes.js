@@ -36,3 +36,8 @@ export function deleteTeste(id) {
     const response = axios.delete(`${baseURL}/test/deleted/${id}`);
     return response;
 };
+
+export function updateTeste(body, id) {
+    const response = axios.patch(`${baseURL}/test/updated/${id}`, body)
+    return response;
+};

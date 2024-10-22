@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
-import { deleteTeste, getAllListaTestes } from "../../services/listaTestes";
+import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/listaTestes";
 
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
@@ -18,21 +18,32 @@ const ListaDeTestes = () => {
     };
 
     // Função para atualizar o valor de resultado de um teste
-    const handleChange = (id, e) => {
-        setTestes((prevTestes) =>
-            prevTestes.map((teste) =>
-                teste._id === id ? { ...teste, resultado: e.target.value } : teste
-            )
-        );
+    const handleChange = async (id, e) => {
+        try {
+            //await updateTeste(id, e),
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, resultado: e.target.value } : teste
+                )
+            );
+        } catch (error) {
+            console.log(error);
+
+        }
+        ;
     };
 
     // Função para atualizar o valor de observação de um teste
     const handleObservationChange = (id, e) => {
-        setTestes((prevTestes) =>
-            prevTestes.map((teste) =>
-                teste._id === id ? { ...teste, observacao: e.target.value } : teste
-            )
-        );
+        try {
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, observacao: e.target.value } : teste
+                )
+            );
+        } catch (error) {
+            console.log(error)
+        }
     };
 
     // Cálculo de progresso dos testes
@@ -133,7 +144,8 @@ const ListaDeTestes = () => {
                         <tr key={teste._id}>
                             <td>{teste.description}</td>
                             <td>
-                                <select className="form-control" value={teste.resultado} onChange={(e) => handleChange(teste._id, e)}>
+                                <select className="form-control" value={teste.resultado}
+                                    onChange={(e) => handleChange(teste._id, e)}>
                                     <option value="Não Testado">Não Testado</option>
                                     <option value="Passou">Passou</option>
                                     <option value="Não Passou">Não Passou</option>
@@ -144,8 +156,8 @@ const ListaDeTestes = () => {
                                     type="text"
                                     className="form-control"
                                     value={teste.observacao}
-                                    onChange={(e) => handleObservationChange(teste._id, e)}
                                     placeholder="Observação"
+                                    onChange={(e) => handleObservationChange(teste._id, e)}
                                 />
                             </td>
                             <td>
