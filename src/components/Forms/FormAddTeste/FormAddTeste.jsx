@@ -1,24 +1,37 @@
 import { useEffect, useState } from "react";
-import Input from "../../Input/Input";
-import { getAllGrupos, getAllSubGrupos } from "../../../services/listaTestes";
+import { getAllGrupos, getAllSubGrupos, postTeste } from "../../../services/listaTestes";
 import { useForm } from "react-hook-form";
+import Input from "../../Input/Input";
 
 const FormAddTeste = () => {
     const [checklists, setChecklists] = useState([]);
     const [subchecklists, setSubchecklists] = useState([]);
+    const [checklistAtual, setChecklistAtual] = useState('');
+    const [subchecklistAtual, setSubchecklistAtual] = useState('');
     const [novoChecklist, setNovoChecklist] = useState('');
     const [novoSubchecklist, setNovoSubchecklist] = useState('');
-    const [subchecklistAtual, setSubchecklistAtual] = useState('');
     const [nomeTecnico, setNomeTecnico] = useState('');
-    const [checklistAtual, setChecklistAtual] = useState('');
 
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+    const { register, handleSubmit,reset, formState: { errors }, setValue } = useForm({
         // resolver: zodResolver(gameSchema)
     });
 
     async function adicionarTeste(data) {
-        console.log(data)
+        try {
+            console.log(data);
+            await postTeste(data);
+            reset()
+        } catch (error) {
+            console.log(error)
+        }
     };
+
+    // const adicionarTeste = () => {
+    //     if (novoTeste.trim() === '') return;
+    //     const novoTesteObj = { id: Date.now(), nome: novoTeste, resultado: 'Não Testado', observacao: '' };
+    //     setTestes((prevTestes) => [...prevTestes, novoTesteObj]);
+    //     setNovoTeste('');
+    // };
 
     const handleSelectChange = (e) => {
         const checklistSelecionado = e.target.value;
@@ -60,7 +73,7 @@ const FormAddTeste = () => {
             {/* Dropdown para selecionar Checklist */}
             <div className="form-group">
                 <strong>Selecionar Checklist:</strong>
-                <select className="form-control" value={checklistAtual} onChange={handleSelectChange} register>
+                <select className="form-control" onChange={handleSelectChange} {...register("grupo")}>
                     {checklists.map((checklist) => (
                         <option key={checklist._id} value={checklist.grupo}>{checklist.grupo}</option>
                     ))}
@@ -70,7 +83,7 @@ const FormAddTeste = () => {
             {/* Dropdown para selecionar SubChecklist */}
             <div className="form-group">
                 <strong>Selecionar SubChecklist:</strong>
-                <select className="form-control" value={subchecklistAtual} onChange={handleSubChecklistChange} register>
+                <select className="form-control" onChange={handleSubChecklistChange} {...register("subGrupo")}>
                     {subchecklists.map((subchecklist) => (
                         <option key={subchecklist._id} value={subchecklist.subGrupo}>{subchecklist.subGrupo}</option>
                     ))}
@@ -82,10 +95,10 @@ const FormAddTeste = () => {
                     type="text"
                     className="form-control"
                     placeholder="Novo Teste"
-                    name="teste"
+                    name="description"
                     register={register}
                 />
-                <button className="btn btn-primary mt-2" onClick={adicionarTeste}>Adicionar Teste</button>
+                <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
             </div>
         </form>
     )

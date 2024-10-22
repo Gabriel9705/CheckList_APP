@@ -45,13 +45,6 @@ const ListaDeTestes = () => {
         };
     };
 
-    const adicionarTeste = () => {
-        if (novoTeste.trim() === '') return;
-        const novoTesteObj = { id: Date.now(), nome: novoTeste, resultado: 'Não Testado', observacao: '' };
-        setTestes((prevTestes) => [...prevTestes, novoTesteObj]);
-        setNovoTeste('');
-    };
-
     const excluirTeste = (id) => {
         const novosTestes = testes.filter(teste => teste.id !== id);
         setTestes(novosTestes);
@@ -137,17 +130,6 @@ const ListaDeTestes = () => {
                     ))}
                 </tbody>
             </table>
-
-            <div className="form-group">
-                <input
-                    type="text"
-                    className="form-control"
-                    value={novoTeste}
-                    onChange={(e) => setNovoTeste(e.target.value)}
-                    placeholder="Novo Teste"
-                />
-                <button className="btn btn-primary mt-2" onClick={adicionarTeste}>Adicionar Teste</button>
-            </div>
 
             <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
             <button className="btn btn-success mt-2" onClick={enviarEmailComPDF}>Gerar PDF</button>
