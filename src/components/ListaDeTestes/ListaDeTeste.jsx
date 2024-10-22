@@ -130,12 +130,12 @@ const ListaDeTestes = () => {
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
                 <div className="progress">
-                    <div className="progress-bar bg-success" role="progressbar" style={{ width: `${passouPercent}%` }} aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
+                    <div className="progress-bar progressPassou" role="progressbar" style={{ width: `${passouPercent}%` }} aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
                         {passouPercent}%
                     </div>
                 </div>
                 <div className="progress">
-                    <div className="progress-bar bg-danger" role="progressbar" style={{ width: `${naoPassouPercent}%` }} aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
+                    <div className="progress-bar progressNaoPassou" role="progressbar" style={{ width: `${naoPassouPercent}%` }} aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
                         {naoPassouPercent}%
                     </div>
                 </div>

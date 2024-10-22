@@ -72,3 +72,11 @@ button , h1 {
   text-transform: uppercase;
  
 }
+
+.progressPassou{
+  background-color: #2E8B57;
+}
+
+.progressNaoPassou{
+  background-color:#FF0000 ;
+}
