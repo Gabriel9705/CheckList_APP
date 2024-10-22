@@ -8,54 +8,55 @@ const FormAddTeste = () => {
     const [subchecklists, setSubchecklists] = useState([]);
     const [checklistAtual, setChecklistAtual] = useState('');
     const [subchecklistAtual, setSubchecklistAtual] = useState('');
-    const [novoChecklist, setNovoChecklist] = useState('');
-    const [novoSubchecklist, setNovoSubchecklist] = useState('');
-    const [nomeTecnico, setNomeTecnico] = useState('');
+    const [atualizarChecklists, setAtualizarChecklists] = useState(false); // Controlador de atualização
+    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm();
 
-    const { register, handleSubmit,reset, formState: { errors }, setValue } = useForm({
-        // resolver: zodResolver(gameSchema)
-    });
-
-    async function adicionarTeste(data) {
+    // Função para adicionar um novo teste
+    const adicionarTeste = async (data) => {
         try {
             console.log(data);
             await postTeste(data);
-            reset()
+            reset();
+            setAtualizarChecklists(true); // Sinaliza para atualizar os dados
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     };
 
-    // const adicionarTeste = () => {
-    //     if (novoTeste.trim() === '') return;
-    //     const novoTesteObj = { id: Date.now(), nome: novoTeste, resultado: 'Não Testado', observacao: '' };
-    //     setTestes((prevTestes) => [...prevTestes, novoTesteObj]);
-    //     setNovoTeste('');
-    // };
-
+    // Função para lidar com a mudança de seleção do checklist
     const handleSelectChange = (e) => {
-        const checklistSelecionado = e.target.value;
-        setChecklistAtual(checklistSelecionado);
+        setChecklistAtual(e.target.value);
     };
 
+    // Função para lidar com a mudança de seleção do subchecklist
     const handleSubChecklistChange = (e) => {
-        const subchecklistSelecionada = e.target.value;
-        setSubchecklistAtual(subchecklistSelecionada);
+        setSubchecklistAtual(e.target.value);
     };
 
-    async function findAllGrupos() {
-        const responseG = await getAllGrupos();
-        const responseSub = await getAllSubGrupos();
-        const resG = responseG.data;
-        const resSub = responseSub.data;
-
-        setChecklists(resG);
-        setSubchecklists(resSub);
+    // Função para buscar todos os grupos e subgrupos
+    const findAllGrupos = async () => {
+        try {
+            const responseG = await getAllGrupos();
+            const responseSub = await getAllSubGrupos();
+            setChecklists(responseG.data);
+            setSubchecklists(responseSub.data);
+        } catch (error) {
+            console.error("Erro ao carregar grupos e subgrupos:", error);
+        }
     };
 
+    // useEffect para carregar os grupos e subgrupos ao montar o componente
     useEffect(() => {
-        findAllGrupos()
+        findAllGrupos();
     }, []);
+
+    // useEffect para recarregar os grupos/subgrupos somente quando necessário
+    useEffect(() => {
+        if (atualizarChecklists) {
+            findAllGrupos();
+            setAtualizarChecklists(false); // Resetar flag de atualização
+        }
+    }, [atualizarChecklists]);
 
     return (
         <form onSubmit={handleSubmit(adicionarTeste)}>
@@ -75,7 +76,9 @@ const FormAddTeste = () => {
                 <strong>Selecionar Checklist:</strong>
                 <select className="form-control" onChange={handleSelectChange} {...register("grupo")}>
                     {checklists.map((checklist) => (
-                        <option key={checklist._id} value={checklist.grupo}>{checklist.grupo}</option>
+                        <option key={checklist._id} value={checklist.grupo}>
+                            {checklist.grupo}
+                        </option>
                     ))}
                 </select>
             </div>
@@ -85,7 +88,9 @@ const FormAddTeste = () => {
                 <strong>Selecionar SubChecklist:</strong>
                 <select className="form-control" onChange={handleSubChecklistChange} {...register("subGrupo")}>
                     {subchecklists.map((subchecklist) => (
-                        <option key={subchecklist._id} value={subchecklist.subGrupo}>{subchecklist.subGrupo}</option>
+                        <option key={subchecklist._id} value={subchecklist.subGrupo}>
+                            {subchecklist.subGrupo}
+                        </option>
                     ))}
                 </select>
             </div>
@@ -101,7 +106,7 @@ const FormAddTeste = () => {
                 <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
             </div>
         </form>
-    )
+    );
 };
 
 export default FormAddTeste;
