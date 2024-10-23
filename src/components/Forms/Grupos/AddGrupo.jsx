@@ -4,7 +4,6 @@ import { GruposSchema } from "../../../schema/testesSchema";
 import { ErrorSpan } from "../../../schema/ErrosStyled";
 import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 import Input from "../../Input/Input";
-import { useEffect } from "react";
 
 const AddGrupo = () => {
     const { register, reset, handleSubmit, formState: { errors }, setValue } = useForm({
@@ -16,7 +15,7 @@ const AddGrupo = () => {
         try {
             await postGrupo(data);
             reset();
-            window.location.reload();
+            alert("Grupo adicionado com sucesso!");
         } catch (error) {
             console.log(error)
         }
