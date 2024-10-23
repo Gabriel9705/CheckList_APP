@@ -6,12 +6,9 @@ import { BarraDeProgresso } from "./ListaDeTestesStyled";
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
     const [nomeTecnico, setNomeTecnico] = useState('');
-    const [visible, setVisible] = useState(false);
-    const closeAlert = () => {
-        setVisible(false);
-    };
-
     const [atualizar, setAtualizar] = useState(false); // Controlador para atualizações manuais
+    const [visible, setVisible] = useState(false);
+    const closeAlert = () => { setVisible(false); };
 
     // Função para buscar todos os testes
     const findAllTestes = async () => {
@@ -34,7 +31,6 @@ const ListaDeTestes = () => {
             );
         } catch (error) {
             console.log(error);
-
         }
         ;
     };
@@ -86,7 +82,7 @@ const ListaDeTestes = () => {
         } catch (error) {
             console.log(error)
         }
-    }
+    };
 
     // Função para excluir um teste
     const excluirTeste = async (id) => {

@@ -1,10 +1,13 @@
 import { useForm } from "react-hook-form";
-import Input from "../../Input/Input";
 import { postGrupo } from "../../../services/listaTestes";
+import { GruposSchema } from "../../../schema/testesSchema";
+import { ErrorSpan } from "../../../schema/ErrosStyled";
+import Input from "../../Input/Input";
+import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 
 const AddGrupo = () => {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm({
-        // resolver: zodResolver(gameSchema)
+        resolver: zodResolver(GruposSchema)
     });
 
     // Método para adicionar um novo checklist
@@ -23,10 +26,11 @@ const AddGrupo = () => {
                 <Input
                     type="text"
                     className="form-control"
-                    placeholder="Novo Checklist"
+                    placeholder="Novo Grupo..."
                     name="grupo"
                     register={register}
                 />
+                {errors.grupo && <ErrorSpan>{errors.grupo.message}</ErrorSpan>}
                 <button type="submit" className="btn btn-success mt-2">Criar Novo Checklist</button>
             </div>
         </form>

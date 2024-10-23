@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAllGrupos, getAllSubGrupos, postTeste } from "../../../services/listaTestes";
 import { useForm } from "react-hook-form";
+import { TestesSchema } from "../../../schema/testesSchema";
+import { ErrorSpan } from "../../../schema/ErrosStyled";
 import Input from "../../Input/Input";
+import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 
 const FormAddTeste = () => {
     const [checklists, setChecklists] = useState([]);
@@ -9,7 +12,9 @@ const FormAddTeste = () => {
     const [checklistAtual, setChecklistAtual] = useState('');
     const [subchecklistAtual, setSubchecklistAtual] = useState('');
     const [atualizarChecklists, setAtualizarChecklists] = useState(false); // Controlador de atualização
-    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm();
+    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
+        resolver: zodResolver(TestesSchema)
+    });
 
     // Função para adicionar um novo teste
     const adicionarTeste = async (data) => {
@@ -69,6 +74,7 @@ const FormAddTeste = () => {
                     register={register}
                 />
             </div>
+            {errors.tecnico && <ErrorSpan>{errors.tecnico.message}</ErrorSpan>}
 
             {/* Dropdown para selecionar Checklist */}
             <div className="form-group">
@@ -81,6 +87,7 @@ const FormAddTeste = () => {
                     ))}
                 </select>
             </div>
+            {errors.grupo && <ErrorSpan>{errors.grupo.message}</ErrorSpan>}
 
             {/* Dropdown para selecionar SubChecklist */}
             <div className="form-group">
@@ -93,6 +100,7 @@ const FormAddTeste = () => {
                     ))}
                 </select>
             </div>
+            {errors.subGrupo && <ErrorSpan>{errors.subGrupo.message}</ErrorSpan>}
 
             <div className="form-group">
                 <Input
@@ -102,6 +110,7 @@ const FormAddTeste = () => {
                     name="description"
                     register={register}
                 />
+                {errors.description && <ErrorSpan>{errors.description.message}</ErrorSpan>}
                 <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
             </div>
         </form>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import logo from "../../assets/ui-checks.svg";
 import CollapseExample from "../Collapse/CollapseLista";
 import ListaDeTestes from "../ListaDeTestes/ListaDeTeste";
-import AlertExample from "../Alerts/Alerts";
 
 const Main = () => {
     const [modoDark, setModoDark] = useState(false);
