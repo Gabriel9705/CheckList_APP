@@ -1,12 +1,33 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
-import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/listaTestes";
-import { Alert } from "bootstrap";
+import { deleteTeste, getAllGrupos, getAllListaTestes, getAllSubGrupos, updateTeste } from "../../services/listaTestes";
+import { BarraDeProgresso } from "./ListaDeTestesStyled";
 
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
     const [nomeTecnico, setNomeTecnico] = useState('');
     const [atualizar, setAtualizar] = useState(false); // Controlador para atualizações manuais
+    const [visible, setVisible] = useState(false);
+    const closeAlert = () => { setVisible(false); };
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [grupo, setGrupo] = useState([]);
+    const [subGrupo, setSubGrupo] = useState([]);
+
+    const findAllGrupos = async () => {
+        try {
+            const responseG = await getAllGrupos();
+            const responseSub = await getAllSubGrupos();
+            setGrupo(responseG.data);
+            setSubGrupo(responseSub.data);
+        } catch (error) {
+            console.error("Erro ao carregar grupos e subgrupos:", error);
+        }
+    };
+
+    //Função para filtrar os testes
+    const filteredItems = selectedCategory
+        ? testes.filter((item) => item.subGrupo === selectedCategory)
+        : testes;
 
     // Função para buscar todos os testes
     const findAllTestes = async () => {
@@ -25,11 +46,9 @@ const ListaDeTestes = () => {
             setTestes((prevTestes) =>
                 prevTestes.map((teste) =>
                     teste._id === id ? { ...teste, resultado: e.target.value } : teste
-                )
-            );
+                ));
         } catch (error) {
             console.log(error);
-
         }
         ;
     };
@@ -49,9 +68,9 @@ const ListaDeTestes = () => {
 
     // Cálculo de progresso dos testes
     const calcularProgresso = () => {
-        const totalTestes = testes.length;
-        const totalPassou = testes.filter(teste => teste.resultado === 'Passou').length;
-        const totalNaoPassou = testes.filter(teste => teste.resultado === 'Não Passou').length;
+        const totalTestes = filteredItems.length;
+        const totalPassou = filteredItems.filter(teste => teste.resultado === 'Passou').length;
+        const totalNaoPassou = filteredItems.filter(teste => teste.resultado === 'Não Passou').length;
 
         const progressoTotal = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
         const passouPercent = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
@@ -66,18 +85,22 @@ const ListaDeTestes = () => {
         };
     };
 
-    //Fucção para Grava o teste no BD
-    const gravarTeste = async (id) =>{
-        try{
-            await adicionarTesteNoBanco('')
-            //caso precise chamar a API
-            setAtualizar(true);// Alerta quando o teste estiver finaliza 
-        }catch (error) { if(teste._id === "Não Testado" ){
-            Alert(`TEC ${nomeTecnico} TESTE NÃO FOI FINALIZADO !!`)
-            console.error("Erro ao gravar teste:", error);
+    //Função para Grava o teste no BD
+    const gravarTeste = async (id, resultado, observacao) => {
+        try {
+            if (resultado === "Não Testado" || resultado === undefined) {
+                setVisible(true);
+                return;
+            }
+            alert("Teste salvo!")
+            const data = { resultado, observacao };
+            await updateTeste(id, data)
+            setAtualizar(true);// Alerta quando o teste estiver finaliza
+
+        } catch (error) {
+            console.log(error)
         }
-        }
-    }
+    };
 
     // Função para excluir um teste
     const excluirTeste = async (id) => {
@@ -103,7 +126,7 @@ const ListaDeTestes = () => {
         doc.text(`Técnico: ${nomeTecnico}`, 10, 20);
 
         testes.forEach((teste, index) => {
-            doc.text(`${index + 1}. ${teste.description} - Resultado: ${teste.resultado} - Observação: ${teste.observacao}`, 10, 30 + index * 10);
+            doc.text(`${index + 1}. ${teste.tecnico}- ${teste.description} - Resultado: ${teste.resultado} - Observação: ${teste.observacao}`, 10, 30 + index * 10);
         });
 
         doc.save('checklist.pdf');
@@ -115,6 +138,7 @@ const ListaDeTestes = () => {
     // useEffect para carregar os testes ao montar o componente
     useEffect(() => {
         findAllTestes();
+        findAllGrupos();
     }, []);
 
     // useEffect para atualizar os testes apenas quando necessário (evitando loop infinito)
@@ -129,62 +153,90 @@ const ListaDeTestes = () => {
         <>
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
-                <div className="progress">
-                    <div className="progress-bar progressPassou" role="progressbar" style={{ width: `${passouPercent}%` }} aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
-                        {passouPercent}%
-                    </div>
-                </div>
-                <div className="progress">
-                    <div className="progress-bar progressNaoPassou" role="progressbar" style={{ width: `${naoPassouPercent}%` }} aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
-                        {naoPassouPercent}%
-                    </div>
-                </div>
-                <p>Total de Testes: {testes.length}</p>
+
+                <BarraDeProgresso width={`${passouPercent}`} tipo="passou" />
+                <BarraDeProgresso width={`${naoPassouPercent}`} tipo="naoPassou" />
+
+                <p>Total de Testes: {filteredItems.length}</p>
                 <p>Testes que Passaram: {totalPassou} ({passouPercent}%)</p>
                 <p>Testes que Não Passaram: {totalNaoPassou} ({naoPassouPercent}%)</p>
             </div>
 
-            <table className="table table-bordered mt-3">
-                <thead>
-                    <tr>
-                        <th>Casos de Uso!</th>
-                        <th>Resultado</th>
-                        <th>Observação</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {testes.map((teste) => (
-                        <tr key={teste._id}>
-                            <td>{teste.description}</td>
-                            <td>
-                                <select className="form-control" value={teste.resultado}
-                                    onChange={(e) => handleChange(teste._id, e)}>
-                                    <option value="Não Testado">Não Testado</option>
-                                    <option value="Passou">Passou</option>
-                                    <option value="Não Passou">Não Passou</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={teste.observacao}
-                                    placeholder="Observação"
-                                    onChange={(e) => handleObservationChange(teste._id, e)}
-                                />
-                            </td>
-                            <td>
-                                <button className="btn btn-danger" onClick={() => excluirTeste(teste._id)}>Excluir</button>
-                                <button className="btn btn-success" onClick={()=> gravarTeste(teste.id)} >Gravar</button>
-                            </td>
-                        </tr>
+            <div className="container mt-4">
+                {visible && (
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>ATENÇÃO!</strong> TESTE NÃO FOI FINALIZADO !!!
+                        <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
+                    </div>
+                )}
+
+            </div>
+
+            <h3>Filtrar Testes</h3>
+            <div className="mb-3">
+                <label htmlFor="categorySelect" className="form-label">Filtrar por SubGrupo</label>
+                <select
+                    id="categorySelect"
+                    className="form-select"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                    <option value="">Todos</option>
+                    {subGrupo.map((checklist) => (
+                        <option key={checklist._id} value={checklist.subGrupo}>
+                            {checklist.subGrupo}
+                        </option>
                     ))}
-                </tbody>
-            </table>
-            {/*Teste */}
-            <button className="btn btn-warning mt-2" onClick={resetarTestes}>Resetar Testes</button>
-            <button className="btn btn-success mt-2 PDF space" onClick={enviarEmailComPDF}>Gerar PDF</button>
+                </select>
+            </div>
+            {filteredItems.length > 0 ? (
+                <table className="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Grupo</th>
+                            <th>Casos de Uso!</th>
+                            <th>Resultado</th>
+                            <th>Observação</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredItems.map((teste) => (
+                            <tr key={teste._id} >
+                                <td>{teste.grupo}</td>
+                                <td>{teste.description}</td>
+                                <td>
+                                    <select className="form-control" value={teste.resultado}
+                                        onChange={(e) => handleChange(teste._id, e)}
+                                    >
+                                        <option value="Não Testado">Não Testado</option>
+                                        <option value="Passou">Passou</option>
+                                        <option value="Não Passou">Não Passou</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={teste.observacao}
+                                        placeholder="Observação"
+                                        onChange={(e) => handleObservationChange(teste._id, e)}
+                                    />
+                                </td>
+                                <td>
+                                    <button className="btn btn-danger space" onClick={() => excluirTeste(teste._id)}>Excluir</button>
+                                    <button className="btn btn-success"
+                                        onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)} >Gravar</button>
+
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (<li className="list-group-item">Nenhum item encontrado "{selectedCategory}"</li>)}
+
+            <button className="btn btn-warning mt-2 space" onClick={resetarTestes}>Resetar Testes</button>
+            <button className="btn btn-success mt-2 PDF" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
     );
 };

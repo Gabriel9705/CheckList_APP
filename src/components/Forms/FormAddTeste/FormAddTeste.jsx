@@ -1,36 +1,30 @@
 import { useEffect, useState } from "react";
 import { getAllGrupos, getAllSubGrupos, postTeste } from "../../../services/listaTestes";
 import { useForm } from "react-hook-form";
+import { TestesSchema } from "../../../schema/testesSchema";
+import { ErrorSpan } from "../../../schema/ErrosStyled";
+import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 import Input from "../../Input/Input";
 
 const FormAddTeste = () => {
     const [checklists, setChecklists] = useState([]);
     const [subchecklists, setSubchecklists] = useState([]);
-    const [checklistAtual, setChecklistAtual] = useState('');
+    const { checklistAtual, setChecklistAtual } = useState('');
     const [subchecklistAtual, setSubchecklistAtual] = useState('');
     const [atualizarChecklists, setAtualizarChecklists] = useState(false); // Controlador de atualização
-    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm();
+    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
+        resolver: zodResolver(TestesSchema)
+    });
 
     // Função para adicionar um novo teste
     const adicionarTeste = async (data) => {
         try {
-            console.log(data);
             await postTeste(data);
             reset();
             setAtualizarChecklists(true); // Sinaliza para atualizar os dados
         } catch (error) {
             console.log(error);
         }
-    };
-
-    // Função para lidar com a mudança de seleção do checklist
-    const handleSelectChange = (e) => {
-        setChecklistAtual(e.target.value);
-    };
-
-    // Função para lidar com a mudança de seleção do subchecklist
-    const handleSubChecklistChange = (e) => {
-        setSubchecklistAtual(e.target.value);
     };
 
     // Função para buscar todos os grupos e subgrupos
@@ -70,11 +64,14 @@ const FormAddTeste = () => {
                     register={register}
                 />
             </div>
+            {errors.tecnico && <ErrorSpan>{errors.tecnico.message}</ErrorSpan>}
 
             {/* Dropdown para selecionar Checklist */}
             <div className="form-group">
-                <strong>Selecionar Checklist:</strong>
-                <select className="form-control" onChange={handleSelectChange} {...register("grupo")}>
+                <strong>Selecionar um Grupo:</strong>
+                <select className="form-control"
+                    onChange={(e) => setChecklistAtual(e.target.value)} {...register("grupo")}>
+                    <option selected value=""></option>
                     {checklists.map((checklist) => (
                         <option key={checklist._id} value={checklist.grupo}>
                             {checklist.grupo}
@@ -82,11 +79,14 @@ const FormAddTeste = () => {
                     ))}
                 </select>
             </div>
+            {errors.grupo && <ErrorSpan>{errors.grupo.message}</ErrorSpan>}
 
             {/* Dropdown para selecionar SubChecklist */}
             <div className="form-group">
-                <strong>Selecionar SubChecklist:</strong>
-                <select className="form-control" onChange={handleSubChecklistChange} {...register("subGrupo")}>
+                <strong>Selecionar um SubGrupo:</strong>
+                <select className="form-control"
+                    onChange={(e) => setSubchecklistAtual(e.target.value)} {...register("subGrupo")}>
+                    <option selected value=""></option>
                     {subchecklists.map((subchecklist) => (
                         <option key={subchecklist._id} value={subchecklist.subGrupo}>
                             {subchecklist.subGrupo}
@@ -94,6 +94,7 @@ const FormAddTeste = () => {
                     ))}
                 </select>
             </div>
+            {errors.subGrupo && <ErrorSpan>{errors.subGrupo.message}</ErrorSpan>}
 
             <div className="form-group">
                 <Input
@@ -103,6 +104,7 @@ const FormAddTeste = () => {
                     name="description"
                     register={register}
                 />
+                {errors.description && <ErrorSpan>{errors.description.message}</ErrorSpan>}
                 <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
             </div>
         </form>
