@@ -203,7 +203,7 @@ const ListaDeTestes = () => {
                     <tbody>
                         {filteredItems.map((teste) => (
                             <tr key={teste._id} >
-                                <td>{teste.grupo}</td>
+                                <td>{teste.grupo.nome}</td>
                                 <td>{teste.description}</td>
                                 <td>
                                     <select className="form-control" value={teste.resultado}

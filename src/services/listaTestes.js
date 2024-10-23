@@ -13,6 +13,11 @@ export function getAllSubGrupos() {
     return response;
 };
 
+export function getSubGrupoPorGrupo(grupoId) {
+    const response = axios.get(`${baseURL}/test/subgrupos/por-grupo/${grupoId}`);
+    return response;
+};
+
 export function getAllListaTestes() {
     const response = axios.get(`${baseURL}/test`);
     return response;
