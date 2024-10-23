@@ -1,10 +1,16 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
 import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/listaTestes";
+import { BarraDeProgresso } from "./ListaDeTestesStyled";
 
 const ListaDeTestes = () => {
     const [testes, setTestes] = useState([]);
     const [nomeTecnico, setNomeTecnico] = useState('');
+    const [visible, setVisible] = useState(false);
+    const closeAlert = () => {
+        setVisible(false);
+    };
+
     const [atualizar, setAtualizar] = useState(false); // Controlador para atualizações manuais
 
     // Função para buscar todos os testes
@@ -69,7 +75,7 @@ const ListaDeTestes = () => {
     const gravarTeste = async (id, resultado, observacao) => {
         try {
             if (resultado === "Não Testado" || resultado === undefined) {
-                alert(`TEC ${nomeTecnico} TESTE NÃO FOI FINALIZADO !!`)
+                setVisible(true);
                 return;
             }
             const data = { resultado, observacao };
@@ -133,17 +139,22 @@ const ListaDeTestes = () => {
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
 
-                <div className="progress" role="progressbar" aria-valuenow={passouPercent} aria-valuemin="0" aria-valuemax="100">
-                    <div className="progress-bar bg-success" style={{ width: `${passouPercent}%` }}>{passouPercent}%</div>
-                </div>
-
-                <div className="progress" role="progressbar" aria-valuenow={naoPassouPercent} aria-valuemin="0" aria-valuemax="100">
-                    <div className="progress-bar bg-danger" style={{ width: `${naoPassouPercent}%` }}>{naoPassouPercent}%</div>
-                </div>
+                <BarraDeProgresso width={`${passouPercent}`} tipo="passou" />
+                <BarraDeProgresso width={`${naoPassouPercent}`} tipo="naoPassou" />
 
                 <p>Total de Testes: {testes.length}</p>
                 <p>Testes que Passaram: {totalPassou} ({passouPercent}%)</p>
                 <p>Testes que Não Passaram: {totalNaoPassou} ({naoPassouPercent}%)</p>
+            </div>
+
+            <div className="container mt-4">
+                {visible && (
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>ATENÇÃO!</strong> TESTE NÃO FOI FINALIZADO !!!
+                        <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
+                    </div>
+                )}
+
             </div>
 
             <table className="table table-bordered mt-3">
@@ -181,6 +192,7 @@ const ListaDeTestes = () => {
                                 <button className="btn btn-danger space" onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                 <button className="btn btn-success"
                                     onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)} >Gravar</button>
+
                             </td>
                         </tr>
                     ))}

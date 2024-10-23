@@ -14,7 +14,6 @@ const FormAddTeste = () => {
     // Função para adicionar um novo teste
     const adicionarTeste = async (data) => {
         try {
-            console.log(data);
             await postTeste(data);
             reset();
             setAtualizarChecklists(true); // Sinaliza para atualizar os dados
