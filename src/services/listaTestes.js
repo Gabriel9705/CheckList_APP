@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:3000";
+//const baseURL = "http://localhost:3000";
+const baseURL = "https://checklist-api-dbyw.onrender.com";
 
 export function getAllGrupos() {
     const response = axios.get(`${baseURL}/test/grupo`);

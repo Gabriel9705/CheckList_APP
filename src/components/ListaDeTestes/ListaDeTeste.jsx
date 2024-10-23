@@ -26,7 +26,7 @@ const ListaDeTestes = () => {
 
     //Função para filtrar os testes
     const filteredItems = selectedCategory
-        ? testes.filter((item) => item.grupo === selectedCategory)
+        ? testes.filter((item) => item.subGrupo === selectedCategory)
         : testes;
 
     // Função para buscar todos os testes
@@ -85,15 +85,15 @@ const ListaDeTestes = () => {
         };
     };
 
-    //Fucção para Grava o teste no BD
+    //Função para Grava o teste no BD
     const gravarTeste = async (id, resultado, observacao) => {
         try {
             if (resultado === "Não Testado" || resultado === undefined) {
                 setVisible(true);
                 return;
             }
+            alert("Teste salvo!")
             const data = { resultado, observacao };
-            console.log(id, data)
             await updateTeste(id, data)
             setAtualizar(true);// Alerta quando o teste estiver finaliza
 
