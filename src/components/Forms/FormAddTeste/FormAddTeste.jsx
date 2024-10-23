@@ -3,13 +3,13 @@ import { getAllGrupos, getAllSubGrupos, postTeste } from "../../../services/list
 import { useForm } from "react-hook-form";
 import { TestesSchema } from "../../../schema/testesSchema";
 import { ErrorSpan } from "../../../schema/ErrosStyled";
-import Input from "../../Input/Input";
 import { zodResolver } from "@hookform/resolvers/zod/src/zod";
+import Input from "../../Input/Input";
 
 const FormAddTeste = () => {
     const [checklists, setChecklists] = useState([]);
     const [subchecklists, setSubchecklists] = useState([]);
-    const [checklistAtual, setChecklistAtual] = useState('');
+    const { checklistAtual, setChecklistAtual } = useState('');
     const [subchecklistAtual, setSubchecklistAtual] = useState('');
     const [atualizarChecklists, setAtualizarChecklists] = useState(false); // Controlador de atualização
     const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
@@ -25,16 +25,6 @@ const FormAddTeste = () => {
         } catch (error) {
             console.log(error);
         }
-    };
-
-    // Função para lidar com a mudança de seleção do checklist
-    const handleSelectChange = (e) => {
-        setChecklistAtual(e.target.value);
-    };
-
-    // Função para lidar com a mudança de seleção do subchecklist
-    const handleSubChecklistChange = (e) => {
-        setSubchecklistAtual(e.target.value);
     };
 
     // Função para buscar todos os grupos e subgrupos
@@ -78,8 +68,10 @@ const FormAddTeste = () => {
 
             {/* Dropdown para selecionar Checklist */}
             <div className="form-group">
-                <strong>Selecionar Checklist:</strong>
-                <select className="form-control" onChange={handleSelectChange} {...register("grupo")}>
+                <strong>Selecionar um Grupo:</strong>
+                <select className="form-control"
+                    onChange={(e) => setChecklistAtual(e.target.value)} {...register("grupo")}>
+                    <option selected value=""></option>
                     {checklists.map((checklist) => (
                         <option key={checklist._id} value={checklist.grupo}>
                             {checklist.grupo}
@@ -91,8 +83,10 @@ const FormAddTeste = () => {
 
             {/* Dropdown para selecionar SubChecklist */}
             <div className="form-group">
-                <strong>Selecionar SubChecklist:</strong>
-                <select className="form-control" onChange={handleSubChecklistChange} {...register("subGrupo")}>
+                <strong>Selecionar um SubGrupo:</strong>
+                <select className="form-control"
+                    onChange={(e) => setSubchecklistAtual(e.target.value)} {...register("subGrupo")}>
+                    <option selected value=""></option>
                     {subchecklists.map((subchecklist) => (
                         <option key={subchecklist._id} value={subchecklist.subGrupo}>
                             {subchecklist.subGrupo}

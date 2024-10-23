@@ -2,11 +2,12 @@ import { useForm } from "react-hook-form";
 import { postGrupo } from "../../../services/listaTestes";
 import { GruposSchema } from "../../../schema/testesSchema";
 import { ErrorSpan } from "../../../schema/ErrosStyled";
-import Input from "../../Input/Input";
 import { zodResolver } from "@hookform/resolvers/zod/src/zod";
+import Input from "../../Input/Input";
+import { useEffect } from "react";
 
 const AddGrupo = () => {
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+    const { register, reset, handleSubmit, formState: { errors }, setValue } = useForm({
         resolver: zodResolver(GruposSchema)
     });
 
@@ -14,6 +15,8 @@ const AddGrupo = () => {
     const adicionarChecklist = async (data) => {
         try {
             await postGrupo(data);
+            reset();
+            window.location.reload();
         } catch (error) {
             console.log(error)
         }

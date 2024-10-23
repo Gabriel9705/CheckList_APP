@@ -15,6 +15,7 @@ const AddSubGrupo = () => {
     const adicionarSubChecklist = async (data) => {
         try {
             await postSubGrupo(data);
+            window.location.reload();
         } catch (error) {
             console.log(error)
         }
