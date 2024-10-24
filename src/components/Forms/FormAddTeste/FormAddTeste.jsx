@@ -1,114 +1,15 @@
-import { useEffect, useState } from "react";
-import { getAllGrupos, getAllSubGrupos, postTeste } from "../../../services/listaTestes";
-import { useForm } from "react-hook-form";
-import { TestesSchema } from "../../../schema/testesSchema";
-import { ErrorSpan } from "../../../schema/ErrosStyled";
-import { zodResolver } from "@hookform/resolvers/zod/src/zod";
-import Input from "../../Input/Input";
+import { useState } from "react";
+import FiltroGrupoSubGrupo from "../../TesteFiltro/FiltroGrupoSubGrupo";
+import ListaDeTestes from "../../ListaDeTestes/ListaDeTeste";
 
 const FormAddTeste = () => {
-    const [checklists, setChecklists] = useState([]);
-    const [subchecklists, setSubchecklists] = useState([]);
-    const { checklistAtual, setChecklistAtual } = useState('');
-    const [subchecklistAtual, setSubchecklistAtual] = useState('');
-    const [atualizarChecklists, setAtualizarChecklists] = useState(false); // Controlador de atualização
-    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
-        resolver: zodResolver(TestesSchema)
-    });
-
-    // Função para adicionar um novo teste
-    const adicionarTeste = async (data) => {
-        try {
-            await postTeste(data);
-            reset();
-            setAtualizarChecklists(true); // Sinaliza para atualizar os dados
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    // Função para buscar todos os grupos e subgrupos
-    const findAllGrupos = async () => {
-        try {
-            const responseG = await getAllGrupos();
-            const responseSub = await getAllSubGrupos();
-            setChecklists(responseG.data);
-            setSubchecklists(responseSub.data);
-        } catch (error) {
-            console.error("Erro ao carregar grupos e subgrupos:", error);
-        }
-    };
-
-    // useEffect para carregar os grupos e subgrupos ao montar o componente
-    useEffect(() => {
-        findAllGrupos();
-    }, []);
-
-    // useEffect para recarregar os grupos/subgrupos somente quando necessário
-    useEffect(() => {
-        if (atualizarChecklists) {
-            findAllGrupos();
-            setAtualizarChecklists(false); // Resetar flag de atualização
-        }
-    }, [atualizarChecklists]);
-
+    const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
     return (
-        <form onSubmit={handleSubmit(adicionarTeste)}>
-            <div className="mb-3">
-                <strong>Nome do Técnico:</strong>
-                <Input
-                    type="text"
-                    className="form-control"
-                    name="tecnico"
-                    placeholder="Digite o nome do técnico"
-                    register={register}
-                />
-            </div>
-            {errors.tecnico && <ErrorSpan>{errors.tecnico.message}</ErrorSpan>}
-
-            {/* Dropdown para selecionar Checklist */}
-            <div className="form-group">
-                <strong>Selecionar um Grupo:</strong>
-                <select className="form-control"
-                    onChange={(e) => setChecklistAtual(e.target.value)} {...register("grupo")}>
-                    <option selected value=""></option>
-                    {checklists.map((checklist) => (
-                        <option key={checklist._id} value={checklist.grupo}>
-                            {checklist.grupo}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            {errors.grupo && <ErrorSpan>{errors.grupo.message}</ErrorSpan>}
-
-            {/* Dropdown para selecionar SubChecklist */}
-            <div className="form-group">
-                <strong>Selecionar um SubGrupo:</strong>
-                <select className="form-control"
-                    onChange={(e) => setSubchecklistAtual(e.target.value)} {...register("subGrupo")}>
-                    <option selected value=""></option>
-                    {subchecklists.map((subchecklist) => (
-                        <option key={subchecklist._id} value={subchecklist.subGrupo}>
-                            {subchecklist.subGrupo}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            {errors.subGrupo && <ErrorSpan>{errors.subGrupo.message}</ErrorSpan>}
-
-            <div className="form-group">
-                <Input
-                    type="text"
-                    className="form-control"
-                    placeholder="Novo Teste"
-                    name="description"
-                    register={register}
-                />
-                {errors.description && <ErrorSpan>{errors.description.message}</ErrorSpan>}
-                <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
-            </div>
-        </form>
-    );
+        <>
+            <FiltroGrupoSubGrupo setFiltros={setFiltros} />
+            <ListaDeTestes filtros={filtros} />
+        </>
+    )
 };
 
 export default FormAddTeste;

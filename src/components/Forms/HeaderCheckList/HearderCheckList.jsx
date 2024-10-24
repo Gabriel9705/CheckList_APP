@@ -1,13 +1,11 @@
-import AddGrupo from "../Grupos/AddGrupo";
-import AddSubGrupo from "../Grupos/AddSubGrupo";
-import FormAddTeste from "../FormAddTeste/FormAddTeste";
+import CadastroGrupo from "../Grupos/CadastroGrupo";
+import CadastroSubGrupo from "../Grupos/CadastroSubGrupo";
 
 const HeaderCheckList = () => {
     return (
         <>
-            <AddGrupo />
-            <AddSubGrupo />
-            <FormAddTeste />
+            <CadastroGrupo />
+            <CadastroSubGrupo />
         </>
     )
 };

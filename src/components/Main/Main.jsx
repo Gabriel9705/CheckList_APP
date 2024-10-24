@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/ui-checks.svg";
 import CollapseExample from "../Collapse/CollapseLista";
-import ListaDeTestes from "../ListaDeTestes/ListaDeTeste";
-import FiltroGrupoSubGrupo from "../TesteFiltro/TesteFiltro";
+import FormAddTeste from "../Forms/FormAddTeste/FormAddTeste";
 
 const Main = () => {
     const [modoDark, setModoDark] = useState(false);
@@ -32,9 +31,7 @@ const Main = () => {
             <div className={`container ${modoDark ? 'dark-mode' : ''}`}>
                 {/* <h1 className='checklist'>Checklist de Testes</h1> */}
                 <CollapseExample />
-                <ListaDeTestes />
-
-                <FiltroGrupoSubGrupo/>
+                <FormAddTeste />
             </div>
         </>
     )

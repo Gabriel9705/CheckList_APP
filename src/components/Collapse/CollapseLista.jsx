@@ -17,7 +17,7 @@ const CollapseExample = () => {
                 aria-expanded={isOpen}
                 aria-controls="collapseExample"
             >
-                {isOpen ? 'Esconder' : 'Mostrar'} Adição de Testes
+                {isOpen ? 'Esconder' : 'Mostrar'} Adição de Grupos e SubGrupos para os Testes
             </button>
 
             <div className={`collapse ${isOpen ? 'show' : ''}`} id="collapseExample">

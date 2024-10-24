@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/listaTestes';
 
-const FiltroGrupoSubGrupo = () => {
+const TesteFiltro = () => {
   const [grupos, setGrupos] = useState([]);
   const [subGrupos, setSubGrupos] = useState([]);
   const [grupoSelecionado, setGrupoSelecionado] = useState("");
@@ -72,4 +72,4 @@ const FiltroGrupoSubGrupo = () => {
   );
 };
 
-export default FiltroGrupoSubGrupo;
+export default TesteFiltro;

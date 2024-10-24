@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import { deleteTeste, getAllGrupos, getAllListaTestes, getAllSubGrupos, updateTeste } from "../../services/listaTestes";
 import { BarraDeProgresso } from "./ListaDeTestesStyled";
 
-const ListaDeTestes = () => {
+const ListaDeTestes = ({ filtros }) => {
     const [testes, setTestes] = useState([]);
     const [nomeTecnico, setNomeTecnico] = useState('');
     const [atualizar, setAtualizar] = useState(false); // Controlador para atualizações manuais
     const [visible, setVisible] = useState(false);
     const closeAlert = () => { setVisible(false); };
-    const [selectedCategory, setSelectedCategory] = useState('');
     const [grupo, setGrupo] = useState([]);
     const [subGrupo, setSubGrupo] = useState([]);
 
@@ -24,10 +23,12 @@ const ListaDeTestes = () => {
         }
     };
 
-    //Função para filtrar os testes
-    const filteredItems = selectedCategory
-        ? testes.filter((item) => item.subGrupo === selectedCategory)
-        : testes;
+    //Função para filtrar os testes de acordo com o grupo e subgrupo selecionado
+    const filteredItems = testes.filter((item) => {
+        const grupoValido = !filtros.grupo || item.grupo._id === filtros.grupo; // Comparar pelo ID do grupo
+        const subGrupoValido = !filtros.subGrupo || item.subGrupo.nome === filtros.subGrupo; // Comparação pelo nome do subgrupo
+        return grupoValido && subGrupoValido;
+    });
 
     // Função para buscar todos os testes
     const findAllTestes = async () => {
@@ -37,52 +38,6 @@ const ListaDeTestes = () => {
         } catch (error) {
             console.error("Erro ao buscar testes:", error);
         }
-    };
-
-    // Função para atualizar o valor de resultado de um teste
-    const handleChange = async (id, e) => {
-        try {
-            //await updateTeste(id, e),
-            setTestes((prevTestes) =>
-                prevTestes.map((teste) =>
-                    teste._id === id ? { ...teste, resultado: e.target.value } : teste
-                ));
-        } catch (error) {
-            console.log(error);
-        }
-        ;
-    };
-
-    // Função para atualizar o valor de observação de um teste
-    const handleObservationChange = (id, e) => {
-        try {
-            setTestes((prevTestes) =>
-                prevTestes.map((teste) =>
-                    teste._id === id ? { ...teste, observacao: e.target.value } : teste
-                )
-            );
-        } catch (error) {
-            console.log(error)
-        }
-    };
-
-    // Cálculo de progresso dos testes
-    const calcularProgresso = () => {
-        const totalTestes = filteredItems.length;
-        const totalPassou = filteredItems.filter(teste => teste.resultado === 'Passou').length;
-        const totalNaoPassou = filteredItems.filter(teste => teste.resultado === 'Não Passou').length;
-
-        const progressoTotal = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
-        const passouPercent = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
-        const naoPassouPercent = totalTestes ? (totalNaoPassou / totalTestes) * 100 : 0;
-
-        return {
-            progressoTotal: progressoTotal.toFixed(2),
-            passouPercent: passouPercent.toFixed(2),
-            naoPassouPercent: naoPassouPercent.toFixed(2),
-            totalPassou,
-            totalNaoPassou,
-        };
     };
 
     //Função para Grava o teste no BD
@@ -99,6 +54,31 @@ const ListaDeTestes = () => {
 
         } catch (error) {
             console.log(error)
+        }
+    };
+
+    // Função para atualizar o valor de resultado de um teste
+    const handleChange = async (id, e) => {
+        try {
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, resultado: e.target.value } : teste
+                ));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    // Função para atualizar o valor de observação de um teste
+    const handleObservationChange = (id, e) => {
+        try {
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, observacao: e.target.value } : teste
+                )
+            );
+        } catch (error) {
+            console.log(error);
         }
     };
 
@@ -133,7 +113,24 @@ const ListaDeTestes = () => {
         // Implementar envio de email com biblioteca de email aqui
     };
 
-    const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
+    // Cálculo de progresso dos testes
+    const calcularProgresso = () => {
+        const totalTestes = filteredItems.length;
+        const totalPassou = filteredItems.filter(teste => teste.resultado === 'Passou').length;
+        const totalNaoPassou = filteredItems.filter(teste => teste.resultado === 'Não Passou').length;
+
+        const progressoTotal = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
+        const passouPercent = totalTestes ? (totalPassou / totalTestes) * 100 : 0;
+        const naoPassouPercent = totalTestes ? (totalNaoPassou / totalTestes) * 100 : 0;
+
+        return {
+            progressoTotal: progressoTotal.toFixed(2),
+            passouPercent: passouPercent.toFixed(2),
+            naoPassouPercent: naoPassouPercent.toFixed(2),
+            totalPassou,
+            totalNaoPassou,
+        };
+    };
 
     // useEffect para carregar os testes ao montar o componente
     useEffect(() => {
@@ -141,13 +138,15 @@ const ListaDeTestes = () => {
         findAllGrupos();
     }, []);
 
-    // useEffect para atualizar os testes apenas quando necessário (evitando loop infinito)
+    // useEffect para atualizar os testes quando a flag "atualizar" for true
     useEffect(() => {
         if (atualizar) {
             findAllTestes();
             setAtualizar(false); // Resetar flag de atualização
         }
     }, [atualizar]);
+
+    const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
 
     return (
         <>
@@ -172,23 +171,6 @@ const ListaDeTestes = () => {
 
             </div>
 
-            <h3>Filtrar Testes</h3>
-            <div className="mb-3">
-                <label htmlFor="categorySelect" className="form-label">Filtrar por SubGrupo</label>
-                <select
-                    id="categorySelect"
-                    className="form-select"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                    <option value="">Todos</option>
-                    {subGrupo.map((checklist) => (
-                        <option key={checklist._id} value={checklist.subGrupo}>
-                            {checklist.subGrupo}
-                        </option>
-                    ))}
-                </select>
-            </div>
             {filteredItems.length > 0 ? (
                 <table className="table table-bordered mt-3">
                     <thead>
@@ -202,11 +184,13 @@ const ListaDeTestes = () => {
                     </thead>
                     <tbody>
                         {filteredItems.map((teste) => (
-                            <tr key={teste._id} >
+                            <tr key={teste._id}>
                                 <td>{teste.grupo.nome}</td>
                                 <td>{teste.description}</td>
                                 <td>
-                                    <select className="form-control" value={teste.resultado}
+                                    <select
+                                        className="form-control"
+                                        value={teste.resultado}
                                         onChange={(e) => handleChange(teste._id, e)}
                                     >
                                         <option value="Não Testado">Não Testado</option>
@@ -226,14 +210,16 @@ const ListaDeTestes = () => {
                                 <td>
                                     <button className="btn btn-danger space" onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                     <button className="btn btn-success"
-                                        onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)} >Gravar</button>
-
+                                        onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)}
+                                    >Gravar</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-            ) : (<li className="list-group-item">Nenhum item encontrado "{selectedCategory}"</li>)}
+            ) : (
+                <p className="list-group-item">Nenhum teste encontrado.</p>
+            )}
 
             <button className="btn btn-warning mt-2 space" onClick={resetarTestes}>Resetar Testes</button>
             <button className="btn btn-success mt-2 PDF" onClick={enviarEmailComPDF}>Gerar PDF</button>

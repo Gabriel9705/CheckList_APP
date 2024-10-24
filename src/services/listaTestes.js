@@ -1,7 +1,7 @@
 import axios from "axios";
 
-//const baseURL = "http://localhost:3000";
-const baseURL = "https://checklist-api-dbyw.onrender.com";
+const baseURL = "http://localhost:3000";
+//const baseURL = "https://checklist-api-dbyw.onrender.com";
 
 export function getAllGrupos() {
     const response = axios.get(`${baseURL}/test/grupo`);
@@ -34,11 +34,7 @@ export function postSubGrupo(body) {
 };
 
 export function postTeste(data) {
-    const body = {
-        ...data,
-        resultado: "Não Testado"
-    }
-    const response = axios.post(`${baseURL}/test/created`, body)
+    const response = axios.post(`${baseURL}/test/created`, data)
     return response;
 };
 
