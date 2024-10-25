@@ -67,6 +67,7 @@ const FiltroGrupoSubGrupo = ({ setFiltros }) => {
         };
 
         await postTeste(testeData); // Enviar os dados
+        alert("Teste adicionado com sucesso!")
         setFormValues({ tecnico: "", grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
       } catch (error) {
         console.error("Erro ao enviar os dados:", error);

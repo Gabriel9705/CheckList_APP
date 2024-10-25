@@ -208,10 +208,10 @@ const ListaDeTestes = ({ filtros }) => {
                                     />
                                 </td>
                                 <td>
-                                    <button className="btn btn-danger space" onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                     <button className="btn btn-success"
                                         onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)}
                                     >Gravar</button>
+                                    <button className="btn btn-danger space" disabled="true" onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                 </td>
                             </tr>
                         ))}
