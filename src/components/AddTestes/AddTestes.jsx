@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { ErrorSpan } from '../../schema/ErrosStyled';
 import { postTeste } from '../../services/testes.service';
 import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/grupos.service';
+import { useNavigate } from 'react-router-dom';
 
-const FiltroGrupoSubGrupo = ({ setFiltros }) => {
+const AddTestes = () => {
+  const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
   const [formValues, setFormValues] = useState({
     tecnico: "",
     description: "",
@@ -50,6 +52,8 @@ const FiltroGrupoSubGrupo = ({ setFiltros }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const navigate = useNavigate();
+
   // Função para lidar com o envio do formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,7 +72,8 @@ const FiltroGrupoSubGrupo = ({ setFiltros }) => {
         };
 
         await postTeste(testeData); // Enviar os dados
-        alert("Teste adicionado com sucesso!")
+        alert("Teste adicionado com sucesso!");
+        navigate("/")
         setFormValues({ tecnico: "", grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
       } catch (error) {
         console.error("Erro ao enviar os dados:", error);
@@ -181,4 +186,4 @@ const FiltroGrupoSubGrupo = ({ setFiltros }) => {
   );
 };
 
-export default FiltroGrupoSubGrupo;
+export default AddTestes;

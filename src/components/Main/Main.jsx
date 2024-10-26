@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/ui-checks.svg";
-import CollapseExample from "../Collapse/CollapseLista";
-import FormAddTeste from "../Forms/FormAddTeste/FormAddTeste";
+import { Link, Outlet } from "react-router-dom";
 
 const Main = () => {
     const [modoDark, setModoDark] = useState(false);
@@ -18,20 +17,21 @@ const Main = () => {
         <>
             <nav className="navbar navbar-dark bg-primary">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
-                        <img src={logo} alt="Logo CheckList" width="30" height="30" className="d-inline-block align-text-top" />
-                        Checklist de Testes
-                    </a>
+                    <Link to="/">
+                        <h1 className="navbar-brand">
+                            <img src={logo} alt="Logo CheckList" width="30" height="30" className="d-inline-block align-text-top" />
+                            Checklist de Testes
+                        </h1>
+                    </Link>
                     {/* Botão para alternar o modo escuro */}
                     <button onClick={toggleModoDark} className="btn btn-secondary mb-3">
                         {modoDark ? 'Modo Claro' : 'Modo Escuro'}
                     </button>
                 </div>
-            </nav>
+            </nav >
             <div className={`container ${modoDark ? 'dark-mode' : ''}`}>
-                {/* <h1 className='checklist'>Checklist de Testes</h1> */}
-                <CollapseExample />
-                <FormAddTeste />
+
+                <Outlet />
             </div>
         </>
     )

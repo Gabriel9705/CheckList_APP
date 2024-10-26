@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:3000";
-//const baseURL = "https://checklist-api-dbyw.onrender.com";
+//const baseURL = "http://localhost:3000";
+const baseURL = "https://checklist-api-dbyw.onrender.com";
 
 export function getAllListaTestes() {
     const response = axios.get(`${baseURL}/test`);

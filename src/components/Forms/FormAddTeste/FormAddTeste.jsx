@@ -1,13 +1,13 @@
-import { useState } from "react";
-import FiltroGrupoSubGrupo from "../../TesteFiltro/FiltroGrupoSubGrupo";
-import ListaDeTestes from "../../ListaDeTestes/ListaDeTeste";
+import AddTestes from "../../AddTestes/AddTestes";
+import CadastroGrupo from "../Grupos/CadastroGrupo";
+import CadastroSubGrupo from "../Grupos/CadastroSubGrupo";
 
 const FormAddTeste = () => {
-    const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
     return (
         <>
-            <FiltroGrupoSubGrupo setFiltros={setFiltros} />
-            <ListaDeTestes filtros={filtros} />
+            <CadastroGrupo />
+            <CadastroSubGrupo />
+            <AddTestes />
         </>
     )
 };

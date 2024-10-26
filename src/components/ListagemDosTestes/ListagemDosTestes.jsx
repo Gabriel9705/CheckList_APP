@@ -1,18 +1,20 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
-import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/testes.service"
+import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/testes.service";
 import { getAllGrupos, getAllSubGrupos } from "../../services/grupos.service";
-import { BarraDeProgresso } from "./ListaDeTestesStyled";
+import { BarraDeProgresso } from "./ListagemDosTestesStyled";
+import { Link } from "react-router-dom";
 
-const ListaDeTestes = ({ filtros }) => {
+const ListagemDeTestes = () => {
     const [testes, setTestes] = useState([]);
-    const [nomeTecnico, setNomeTecnico] = useState('');
-    const [atualizar, setAtualizar] = useState(false); // Controlador para atualizações manuais
-    const [visible, setVisible] = useState(false);
-    const closeAlert = () => { setVisible(false); };
     const [grupo, setGrupo] = useState([]);
     const [subGrupo, setSubGrupo] = useState([]);
+    const [grupoSelecionado, setGrupoSelecionado] = useState(""); // Novo estado para grupo selecionado
+    const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(""); // Novo estado para subgrupo selecionado
+    const [visible, setVisible] = useState(false);
+    const closeAlert = () => { setVisible(false); };
 
+    // Função para buscar todos os Grupos e SubGrupos
     const findAllGrupos = async () => {
         try {
             const responseG = await getAllGrupos();
@@ -23,13 +25,6 @@ const ListaDeTestes = ({ filtros }) => {
             console.error("Erro ao carregar grupos e subgrupos:", error);
         }
     };
-
-    //Função para filtrar os testes de acordo com o grupo e subgrupo selecionado
-    const filteredItems = testes.filter((item) => {
-        const grupoValido = !filtros.grupo || item.grupo._id === filtros.grupo; // Comparar pelo ID do grupo
-        const subGrupoValido = !filtros.subGrupo || item.subGrupo.nome === filtros.subGrupo; // Comparação pelo nome do subgrupo
-        return grupoValido && subGrupoValido;
-    });
 
     // Função para buscar todos os testes
     const findAllTestes = async () => {
@@ -48,48 +43,12 @@ const ListaDeTestes = ({ filtros }) => {
                 setVisible(true);
                 return;
             }
-            alert("Teste salvo!")
+            alert("Teste salvo!");
             const data = { resultado, observacao };
-            await updateTeste(id, data)
-            setAtualizar(true);// Alerta quando o teste estiver finaliza
-
-        } catch (error) {
-            console.log(error)
-        }
-    };
-
-    // Função para atualizar o valor de resultado de um teste
-    const handleChange = async (id, e) => {
-        try {
-            setTestes((prevTestes) =>
-                prevTestes.map((teste) =>
-                    teste._id === id ? { ...teste, resultado: e.target.value } : teste
-                ));
+            await updateTeste(id, data);
+            setAtualizar(true);
         } catch (error) {
             console.log(error);
-        }
-    };
-
-    // Função para atualizar o valor de observação de um teste
-    const handleObservationChange = (id, e) => {
-        try {
-            setTestes((prevTestes) =>
-                prevTestes.map((teste) =>
-                    teste._id === id ? { ...teste, observacao: e.target.value } : teste
-                )
-            );
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    // Função para excluir um teste
-    const excluirTeste = async (id) => {
-        try {
-            await deleteTeste(id);
-            setAtualizar(true); // Sinaliza para recarregar os testes após exclusão
-        } catch (error) {
-            console.error("Erro ao excluir teste:", error);
         }
     };
 
@@ -98,6 +57,28 @@ const ListaDeTestes = ({ filtros }) => {
         setTestes((prevTestes) =>
             prevTestes.map((teste) => ({ ...teste, resultado: 'Não Testado', observacao: '' }))
         );
+    };
+
+    // Filtrar os subgrupos com base no grupo selecionado
+    const subGruposFiltrados = subGrupo.filter(sg =>
+        sg.grupoId === grupoSelecionado || (sg.grupo && sg.grupo._id === grupoSelecionado)
+    )
+
+    // Filtragem de itens baseada nos valores dos selects de grupo e subgrupo
+    const filteredItems = testes.filter((item) => {
+        const grupoValido = grupoSelecionado ? item.grupo._id === grupoSelecionado : true;
+        const subGrupoValido = subGrupoSelecionado ? item.subGrupo._id === subGrupoSelecionado : true;
+        return grupoValido && subGrupoValido;
+    });
+
+    // Função para excluir um teste
+    const excluirTeste = async (id) => {
+        try {
+            await deleteTeste(id);
+            setAtualizar(true);
+        } catch (error) {
+            console.error("Erro ao excluir teste:", error);
+        }
     };
 
     // Função para gerar e salvar PDF com os testes
@@ -111,7 +92,31 @@ const ListaDeTestes = ({ filtros }) => {
         });
 
         doc.save('checklist.pdf');
-        // Implementar envio de email com biblioteca de email aqui
+    };
+
+    // Função para mudar campo de resultados de um teste
+    const handleChange = async (id, e) => {
+        try {
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, resultado: e.target.value } : teste
+                ));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    // Função para mudar campo de observações de um teste
+    const handleObservationChange = (id, e) => {
+        try {
+            setTestes((prevTestes) =>
+                prevTestes.map((teste) =>
+                    teste._id === id ? { ...teste, observacao: e.target.value } : teste
+                )
+            );
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     // Cálculo de progresso dos testes
@@ -132,28 +137,49 @@ const ListaDeTestes = ({ filtros }) => {
             totalNaoPassou,
         };
     };
+    const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
 
-    // useEffect para carregar os testes ao montar o componente
     useEffect(() => {
         findAllTestes();
         findAllGrupos();
     }, []);
 
-    // useEffect para atualizar os testes quando a flag "atualizar" for true
-    useEffect(() => {
-        if (atualizar) {
-            findAllTestes();
-            setAtualizar(false); // Resetar flag de atualização
-        }
-    }, [atualizar]);
-
-    const { progressoTotal, passouPercent, naoPassouPercent, totalPassou, totalNaoPassou } = calcularProgresso();
-
     return (
         <>
+            <div className="container mt-4">
+                <label className="form-label">Grupo:</label>
+                <select
+                    className="form-select"
+                    value={grupoSelecionado}
+                    onChange={(e) => setGrupoSelecionado(e.target.value)}
+                >
+                    <option value="">Todos os Grupos</option>
+                    {grupo.map((g) => (
+                        <option key={g._id} value={g._id}>{g.nome}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="container mt-4">
+                <label className="form-label">SubGrupo:</label>
+                <select
+                    className="form-select"
+                    value={subGrupoSelecionado}
+                    onChange={(e) => setSubGrupoSelecionado(e.target.value)}
+                    disabled={!grupoSelecionado} // Desabilita se nenhum grupo estiver selecionado
+                >
+                    <option value="">Todos os SubGrupos</option>
+                    {subGruposFiltrados.map((sg) => (
+                        <option key={sg._id} value={sg._id}>{sg.nome}</option>
+                    ))}
+                </select>
+            </div>
+            <Link to="/add_testes">
+                <button className="btn btn-warning mt-2">Adicionar Novos testes</button>
+            </Link>
+
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
-
                 <BarraDeProgresso width={`${passouPercent}`} tipo="passou" />
                 <BarraDeProgresso width={`${naoPassouPercent}`} tipo="naoPassou" />
 
@@ -169,7 +195,6 @@ const ListaDeTestes = ({ filtros }) => {
                         <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
                     </div>
                 )}
-
             </div>
 
             {filteredItems.length > 0 ? (
@@ -228,4 +253,4 @@ const ListaDeTestes = ({ filtros }) => {
     );
 };
 
-export default ListaDeTestes;
+export default ListagemDeTestes;
