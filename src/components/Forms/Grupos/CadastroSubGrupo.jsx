@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAllGrupos, postSubGrupo } from '../../../services/listaTestes';
+import { getAllGrupos, postSubGrupo } from '../../../services/grupos.service';
 
 const CadastroSubGrupo = () => {
     const [nomeSubGrupo, setNomeSubGrupo] = useState('');

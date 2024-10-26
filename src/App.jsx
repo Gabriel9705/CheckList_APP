@@ -1,11 +1,8 @@
-import Main from './components/Main/Main';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import './index.css'
+import { Outlet } from 'react-router-dom';
 
 const App = () => {
-  return (
-    <Main />
-  );
+  return <Outlet />
 }
 
 export default App;

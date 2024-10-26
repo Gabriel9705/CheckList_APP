@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getAllGrupos, getSubGrupoPorGrupo, postTeste } from '../../services/listaTestes';
 import { ErrorSpan } from '../../schema/ErrosStyled';
+import { postTeste } from '../../services/testes.service';
+import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/grupos.service';
 
 const FiltroGrupoSubGrupo = ({ setFiltros }) => {
   const [formValues, setFormValues] = useState({

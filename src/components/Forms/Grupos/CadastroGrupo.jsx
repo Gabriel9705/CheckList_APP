@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { postGrupo } from '../../../services/listaTestes';
+import { postGrupo } from '../../../services/grupos.service';
 
 const CadastroGrupo = () => {
     const [nomeGrupo, setNomeGrupo] = useState('');

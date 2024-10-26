@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { useEffect, useState } from "react";
-import { deleteTeste, getAllGrupos, getAllListaTestes, getAllSubGrupos, updateTeste } from "../../services/listaTestes";
+import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/testes.service"
+import { getAllGrupos, getAllSubGrupos } from "../../services/grupos.service";
 import { BarraDeProgresso } from "./ListaDeTestesStyled";
 
 const ListaDeTestes = ({ filtros }) => {
@@ -211,7 +212,7 @@ const ListaDeTestes = ({ filtros }) => {
                                     <button className="btn btn-success space"
                                         onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)}
                                     >Gravar</button>
-                                    <button className="btn btn-danger space" disabled="true" onClick={() => excluirTeste(teste._id)}>Excluir</button>
+                                    <button className="btn btn-danger space" disabled={true} onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                 </td>
                             </tr>
                         ))}
