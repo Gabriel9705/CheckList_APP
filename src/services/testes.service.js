@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { baseURL } from "./baseURL.js";
 
 export function getAllListaTestes() {
@@ -7,7 +8,12 @@ export function getAllListaTestes() {
 };
 
 export function postTeste(data) {
-    const response = axios.post(`${baseURL}/test/created`, data)
+    const response = axios.post(`${baseURL}/test/created`, data,
+        {
+            headers:
+                { Authorization: `Bearer ${Cookies.get("token")}` }
+        }
+    )
     return response;
 };
 

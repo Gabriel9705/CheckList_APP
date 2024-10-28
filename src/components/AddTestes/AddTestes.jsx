@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+import { useState, useEffect, useContext } from 'react';
 import { ErrorSpan } from '../../schema/ErrosStyled';
 import { postTeste } from '../../services/testes.service';
 import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/grupos.service';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../Context/UserContext';
+import { loggedUser } from '../../services/user.service';
 
 const AddTestes = () => {
+  const { user } = useContext(UserContext);
   const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
   const [formValues, setFormValues] = useState({
-    tecnico: "",
     description: "",
   });
 
@@ -30,12 +33,6 @@ const AddTestes = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formValues.tecnico) {
-      newErrors.tecnico = "O nome do técnico é obrigatório.";
-    }
-    if (formValues.tecnico === '') {
-      newErrors.tecnico = "O nome não pode estar vazio.";
-    }
     if (!formValues.grupo) {
       newErrors.grupo = "O grupo é obrigatório.";
     }
@@ -64,7 +61,6 @@ const AddTestes = () => {
         const subGrupoNome = subGrupos.find(subGrupo => subGrupo.nome === formValues.subGrupo)?.nome;
 
         const testeData = {
-          tecnico: formValues.tecnico[0].toUpperCase() + formValues.tecnico.substring(1),
           grupoNome: grupoNome, // Nome do grupo
           subGrupoNome: subGrupoNome, // Nome do subgrupo
           description: formValues.description[0].toUpperCase() + formValues.description.substring(1),
@@ -74,7 +70,7 @@ const AddTestes = () => {
         await postTeste(testeData); // Enviar os dados
         alert("Teste adicionado com sucesso!");
         navigate("/")
-        setFormValues({ tecnico: "", grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
+        setFormValues({ grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
       } catch (error) {
         console.error("Erro ao enviar os dados:", error);
       }
@@ -121,12 +117,12 @@ const AddTestes = () => {
           type="text"
           className="form-control"
           name="tecnico"
-          placeholder="Digite o nome do técnico"
-          value={formValues.tecnico}
+          placeholder={user.name}
+          value={formValues.user}
           onChange={handleInputChange}
+          disabled
         />
       </div>
-      {errors.tecnico && <ErrorSpan>{errors.tecnico}</ErrorSpan>}
 
       {/* Dropdown para selecionar Grupo */}
       <div className="form-group">

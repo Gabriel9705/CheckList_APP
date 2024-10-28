@@ -1,10 +1,6 @@
 import { z } from "zod";
 
 export const TestesSchema = z.object({
-    tecnico: z.string().nonempty({ message: "O nome do técnico não pode está vazio." })
-        .refine((value) => !/^\s*$/.test(value), {
-            message: "Digite caracteres válidos"
-        }),
     grupo: z.string().nonempty({ message: "Selecione um grupo." })
         .refine((value) => !/^\s*$/.test(value), {
             message: "Digite caracteres válidos"

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { InputStyled } from "./InputStyled";
 
 const Input = ({ type, placeholder, name, className, register, value: initialValue, }) => {
     const [value, setValue] = useState(initialValue);
@@ -9,7 +10,7 @@ const Input = ({ type, placeholder, name, className, register, value: initialVal
     };
 
     return (
-        <input className={className} {...inputProps} />
+        <InputStyled className={className} {...inputProps} />
     )
 };
 

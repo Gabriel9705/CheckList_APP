@@ -3,6 +3,7 @@ import Main from "./components/Main/Main";
 import Error404 from "./components/pages/Error/Error404/Error404";
 import Home from "./components/pages/home/Home";
 import FormAddTeste from "./components/Forms/FormAddTeste/FormAddTeste";
+import Authentication from "./components/pages/Authentication/Authentication";
 
 export const Routes = createBrowserRouter([
     {
@@ -18,5 +19,8 @@ export const Routes = createBrowserRouter([
             element: <FormAddTeste />
         },
         ]
+    }, {
+        path: "/auth/:action",
+        element: <Authentication />
     }
 ])
