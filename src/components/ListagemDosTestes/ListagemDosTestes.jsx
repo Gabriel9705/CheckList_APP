@@ -5,6 +5,7 @@ import { getAllGrupos, getAllSubGrupos } from "../../services/grupos.service";
 import { BarraDeProgresso } from "./ListagemDosTestesStyled";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../Context/UserContext";
+import { finalizarSessao, iniciarSessao } from "../../services/session.service";
 
 const ListagemDeTestes = () => {
     const { user } = useContext(UserContext);
@@ -14,6 +15,7 @@ const ListagemDeTestes = () => {
     const [subGrupo, setSubGrupo] = useState([]);
     const [grupoSelecionado, setGrupoSelecionado] = useState(""); // Novo estado para grupo selecionado
     const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(""); // Novo estado para subgrupo selecionado
+    const [sessaoAtiva, setSessaoAtiva] = useState(null); // Armazena a sessão ativa
     const [visible, setVisible] = useState(false);
     const closeAlert = () => { setVisible(false); };
 
@@ -122,6 +124,27 @@ const ListagemDeTestes = () => {
         }
     };
 
+    const iniciarTestes = async () => {
+        try {
+            const response = await iniciarSessao({ grupoId: grupoSelecionado, subGrupoId: subGrupoSelecionado });
+            setSessaoAtiva(response.data); // Armazena a sessão iniciada
+            alert('Sessão de testes iniciada!');
+        } catch (error) {
+            console.error('Erro ao iniciar a sessão de testes:', error);
+        }
+    };
+
+    const finalizarTestes = async () => {
+        try {
+            if (!sessaoAtiva) return;
+            await finalizarSessao(sessaoAtiva._id);
+            alert('Sessão de testes finalizada!');
+            setSessaoAtiva(null); // Reseta a sessão ativa
+        } catch (error) {
+            console.error('Erro ao finalizar a sessão de testes:', error);
+        }
+    };
+
     // Cálculo de progresso dos testes
     const calcularProgresso = () => {
         const totalTestes = filteredItems.length;
@@ -200,6 +223,10 @@ const ListagemDeTestes = () => {
                 )}
             </div>
 
+            <button onClick={iniciarTestes} className="btn btn-success mt-2" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva}>
+                Iniciar Testes
+            </button>
+
             {filteredItems.length > 0 ? (
                 <table className="table table-bordered mt-3">
                     <thead>
@@ -250,6 +277,9 @@ const ListagemDeTestes = () => {
                 <p className="list-group-item">Nenhum teste encontrado.</p>
             )}
 
+            <button className="btn btn-danger mt-2" onClick={finalizarTestes} disabled={!sessaoAtiva}>
+                Finalizar Testes
+            </button>
             <button className="btn btn-warning mt-2 space" onClick={resetarTestes}>Resetar Testes</button>
             <button className="btn btn-success mt-2 PDF" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
