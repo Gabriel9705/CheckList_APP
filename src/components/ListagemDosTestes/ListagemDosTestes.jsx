@@ -1,11 +1,14 @@
 import jsPDF from "jspdf";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/testes.service";
 import { getAllGrupos, getAllSubGrupos } from "../../services/grupos.service";
 import { BarraDeProgresso } from "./ListagemDosTestesStyled";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../Context/UserContext";
 
 const ListagemDeTestes = () => {
+    const { user } = useContext(UserContext);
+    const admin = user.admin;
     const [testes, setTestes] = useState([]);
     const [grupo, setGrupo] = useState([]);
     const [subGrupo, setSubGrupo] = useState([]);
@@ -237,12 +240,12 @@ const ListagemDeTestes = () => {
                                     <button className="btn btn-success space"
                                         onClick={() => gravarTeste(teste._id, teste.resultado, teste.observacao)}
                                     >Gravar</button>
-                                    <button className="btn btn-danger space" disabled={true} onClick={() => excluirTeste(teste._id)}>Excluir</button>
+                                    <button className="btn btn-danger space" disabled={!admin} onClick={() => excluirTeste(teste._id)}>Excluir</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table >
             ) : (
                 <p className="list-group-item">Nenhum teste encontrado.</p>
             )}
