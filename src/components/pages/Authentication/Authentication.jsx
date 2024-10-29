@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
 import LoginForm from "../../Forms/LoginForm/LoginForm";
 import { AuthContainer, ImgDelogin, SectionForm } from "./AuthenticationStyled";
-import telaDeLogin  from "../../../assets/telaLogin.png";
+import telaDeLogin  from "../../../imgs/telaLogin.png";
+import RegisterForm from "../../Forms/RegisterForm/RegisterForm";
+
 
 const Authentication = () => {
     const { action } = useParams();
