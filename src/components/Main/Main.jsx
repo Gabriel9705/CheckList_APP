@@ -64,7 +64,7 @@ const Main = () => {
                                 <button onClick={() => navigate('auth/register')}>
                                     <i className="bi bi-person-add"></i>Cadastrar Técnicos</button>
                             }
-                            <button onClick={() => navigate('/profile')}>
+                            <button onClick={() => navigate('/sessao_testes')}>
                                 <i className="bi bi-person-lines-fill"></i>Meus Testes</button>
                             <button onClick={toggleModoDark}>
                                 <i className={`bi ${!modoDark ? "bi-moon-stars-fill" : "bi-sun-fill"}`}></i>

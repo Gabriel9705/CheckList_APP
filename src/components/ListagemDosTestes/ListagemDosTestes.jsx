@@ -51,7 +51,6 @@ const ListagemDeTestes = () => {
             alert("Teste salvo!");
             const data = { resultado, observacao };
             await updateTeste(id, data);
-            setAtualizar(true);
         } catch (error) {
             console.log(error);
         }
@@ -126,7 +125,10 @@ const ListagemDeTestes = () => {
 
     const iniciarTestes = async () => {
         try {
-            const response = await iniciarSessao({ grupoId: grupoSelecionado, subGrupoId: subGrupoSelecionado });
+            const response = await iniciarSessao({ grupoId: grupoSelecionado, subGrupoId: subGrupoSelecionado, tecnico: user._id, testes: filteredItems });
+            console.log({
+                grupo: grupoSelecionado, subGrupo: subGrupoSelecionado, tecnico: user._id, testes: filteredItems
+            });
             setSessaoAtiva(response.data); // Armazena a sessão iniciada
             alert('Sessão de testes iniciada!');
         } catch (error) {
@@ -137,11 +139,21 @@ const ListagemDeTestes = () => {
     const finalizarTestes = async () => {
         try {
             if (!sessaoAtiva) return;
-            await finalizarSessao(sessaoAtiva._id);
+
+            const sessionId = sessaoAtiva._id; // ID da sessão ativa
+            const testesAtualizados = filteredItems.map(teste => ({
+                _id: teste._id,
+                resultado: teste.resultado,
+                observacao: teste.observacao,
+            }));
+
+            await finalizarSessao(sessionId, testesAtualizados);
             alert('Sessão de testes finalizada!');
             setSessaoAtiva(null); // Reseta a sessão ativa
+
         } catch (error) {
             console.error('Erro ao finalizar a sessão de testes:', error);
+            alert("Erro ao finalizar a sessão.");
         }
     };
 
@@ -173,21 +185,17 @@ const ListagemDeTestes = () => {
     return (
         <>
             <div className="container mt-4">
-                <label className="form-label">Grupo:</label>
-                <select
-                    className="form-select"
-                    value={grupoSelecionado}
-                    onChange={(e) => setGrupoSelecionado(e.target.value)}
-                >
+
+                <label className="form-label"> <strong>Grupo:</strong></label>
+                <select className="form-select" value={grupoSelecionado}
+                    onChange={(e) => setGrupoSelecionado(e.target.value)}>
                     <option value="">Todos os Grupos</option>
                     {grupo.map((g) => (
                         <option key={g._id} value={g._id}>{g.nome}</option>
                     ))}
                 </select>
-            </div>
 
-            <div className="container mt-4">
-                <label className="form-label">SubGrupo:</label>
+                <label className="form-label"><strong>SubGrupo:</strong></label>
                 <select
                     className="form-select"
                     value={subGrupoSelecionado}
@@ -200,6 +208,7 @@ const ListagemDeTestes = () => {
                     ))}
                 </select>
             </div>
+
             <Link to="/add_testes">
                 <button className="btn btn-warning mt-2">Adicionar Novos testes</button>
             </Link>
@@ -248,6 +257,7 @@ const ListagemDeTestes = () => {
                                         className="form-control"
                                         value={teste.resultado}
                                         onChange={(e) => handleChange(teste._id, e)}
+                                        disabled={!sessaoAtiva && !user.admin}
                                     >
                                         <option value="Não Testado">Não Testado</option>
                                         <option value="Passou">Passou</option>
