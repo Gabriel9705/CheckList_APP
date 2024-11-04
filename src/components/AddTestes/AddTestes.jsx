@@ -6,6 +6,7 @@ import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/grupos.service
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserContext';
 import { loggedUser } from '../../services/user.service';
+import Loading from '../Loading/Loading';
 
 const AddTestes = () => {
   const { user } = useContext(UserContext);
@@ -14,6 +15,7 @@ const AddTestes = () => {
     description: "",
   });
 
+  const [loading, setLoading] = useState(false);
   const [grupos, setGrupos] = useState([]);
   const [subGrupos, setSubGrupos] = useState([]);
   const [errors, setErrors] = useState({});
@@ -53,6 +55,8 @@ const AddTestes = () => {
 
   // Função para lidar com o envio do formulário
   const handleSubmit = async (e) => {
+    setLoading(true)
+
     e.preventDefault();
     if (validateForm()) {
       try {
@@ -73,6 +77,8 @@ const AddTestes = () => {
         setFormValues({ grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
       } catch (error) {
         console.error("Erro ao enviar os dados:", error);
+      } finally{
+        setLoading(false)
       }
     }
   };
@@ -178,6 +184,7 @@ const AddTestes = () => {
         {errors.description && <ErrorSpan>{errors.description}</ErrorSpan>}
         <button className="btn btn-primary mt-2" type="submit">Adicionar Teste</button>
       </div>
+      {loading && <Loading />}
     </form>
   );
 };

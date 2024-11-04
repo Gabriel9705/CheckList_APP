@@ -18,7 +18,12 @@ export function postTeste(data) {
 };
 
 export function deleteTeste(id) {
-    const response = axios.delete(`${baseURL}/test/deleted/${id}`);
+    const response = axios.delete(`${baseURL}/test/deleted/${id}`,
+        {
+            headers:
+                { Authorization: `Bearer ${Cookies.get("token")}` }
+        }
+    );
     return response;
 };
 

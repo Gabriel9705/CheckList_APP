@@ -6,6 +6,9 @@ import { BarraDeProgresso } from "./ListagemDosTestesStyled";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../Context/UserContext";
 import { finalizarSessao, iniciarSessao } from "../../services/session.service";
+import Loading from "../Loading/Loading";
+import { Oval } from "react-loader-spinner";
+import LoadingMenor from "../Loading/LoadingMenor";
 
 const ListagemDeTestes = () => {
     const { user } = useContext(UserContext);
@@ -13,9 +16,12 @@ const ListagemDeTestes = () => {
     const [testes, setTestes] = useState([]);
     const [grupo, setGrupo] = useState([]);
     const [subGrupo, setSubGrupo] = useState([]);
+    const [atualizar, setAtualizar] = useState(false);
     const [grupoSelecionado, setGrupoSelecionado] = useState(""); // Novo estado para grupo selecionado
     const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(""); // Novo estado para subgrupo selecionado
     const [sessaoAtiva, setSessaoAtiva] = useState(null); // Armazena a sessão ativa
+    const [loading, setLoading] = useState(false);
+    const [loadingTestes, setLoadingTestes] = useState(false);
     const [visible, setVisible] = useState(false);
     const closeAlert = () => { setVisible(false); };
 
@@ -33,11 +39,14 @@ const ListagemDeTestes = () => {
 
     // Função para buscar todos os testes
     const findAllTestes = async () => {
+        setLoadingTestes(true)
         try {
             const response = await getAllListaTestes();
             setTestes(response.data);
         } catch (error) {
             console.error("Erro ao buscar testes:", error);
+        } finally {
+            setLoadingTestes(false)
         }
     };
 
@@ -77,11 +86,15 @@ const ListagemDeTestes = () => {
 
     // Função para excluir um teste
     const excluirTeste = async (id) => {
+        setLoading(true)
         try {
             await deleteTeste(id);
+            alert("Teste excluido com sucesso!")
             setAtualizar(true);
         } catch (error) {
             console.error("Erro ao excluir teste:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -124,6 +137,7 @@ const ListagemDeTestes = () => {
     };
 
     const iniciarTestes = async () => {
+        setLoading(true)
         try {
             const response = await iniciarSessao({ grupoId: grupoSelecionado, subGrupoId: subGrupoSelecionado, tecnico: user._id, testes: filteredItems });
             console.log({
@@ -133,10 +147,13 @@ const ListagemDeTestes = () => {
             alert('Sessão de testes iniciada!');
         } catch (error) {
             console.error('Erro ao iniciar a sessão de testes:', error);
+        } finally {
+            setLoading(false)
         }
     };
 
     const finalizarTestes = async () => {
+        setLoading(false)
         try {
             if (!sessaoAtiva) return;
 
@@ -154,6 +171,8 @@ const ListagemDeTestes = () => {
         } catch (error) {
             console.error('Erro ao finalizar a sessão de testes:', error);
             alert("Erro ao finalizar a sessão.");
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -180,7 +199,7 @@ const ListagemDeTestes = () => {
     useEffect(() => {
         findAllTestes();
         findAllGrupos();
-    }, []);
+    }, [atualizar]);
 
     return (
         <>
@@ -232,11 +251,13 @@ const ListagemDeTestes = () => {
                 )}
             </div>
 
+            {loadingTestes && <LoadingMenor />}
+
             <button onClick={iniciarTestes} className="btn btn-success mt-2" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva}>
                 Iniciar Testes
             </button>
 
-            {filteredItems.length > 0 ? (
+            {filteredItems.length > 0 && !loadingTestes ? (
                 <table className="table table-bordered mt-3">
                     <thead>
                         <tr>
@@ -286,6 +307,8 @@ const ListagemDeTestes = () => {
             ) : (
                 <p className="list-group-item">Nenhum teste encontrado.</p>
             )}
+
+            {loading && <Loading />}
 
             <button className="btn btn-danger mt-2" onClick={finalizarTestes} disabled={!sessaoAtiva}>
                 Finalizar Testes
