@@ -10,6 +10,7 @@ const Loading = () => {
                 visible={true}
                 ariaLabel="falling-circles-loading"
             />
+            <p>Carregando...</p>
         </Overlay>
     )
 };

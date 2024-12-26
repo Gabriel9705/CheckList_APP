@@ -8,6 +8,7 @@ export const Overlay = styled.div`
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 1000; /* Garante que fique acima de outros elementos */

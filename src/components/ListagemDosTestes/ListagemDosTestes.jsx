@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../../Context/UserContext";
 import { finalizarSessao, iniciarSessao } from "../../services/session.service";
 import Loading from "../Loading/Loading";
-import { Oval } from "react-loader-spinner";
 import LoadingMenor from "../Loading/LoadingMenor";
 
 const ListagemDeTestes = () => {

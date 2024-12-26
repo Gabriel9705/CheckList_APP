@@ -55,11 +55,10 @@ const AddTestes = () => {
 
   // Função para lidar com o envio do formulário
   const handleSubmit = async (e) => {
-    setLoading(true)
-
     e.preventDefault();
     if (validateForm()) {
       try {
+        setLoading(true);
         // Mapeia o ID para o nome do grupo e subgrupo
         const grupoNome = grupos.find(grupo => grupo._id === formValues.grupo)?.nome;
         const subGrupoNome = subGrupos.find(subGrupo => subGrupo.nome === formValues.subGrupo)?.nome;
