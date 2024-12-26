@@ -8,6 +8,8 @@ import { UserContext } from "../../Context/UserContext";
 import { finalizarSessao, iniciarSessao } from "../../services/session.service";
 import Loading from "../Loading/Loading";
 import LoadingMenor from "../Loading/LoadingMenor";
+import CollapseExample from "../Collapse/CollapseLista";
+import AddTestes from "../AddTestes/AddTestes";
 
 const ListagemDeTestes = () => {
     const { user } = useContext(UserContext);
@@ -23,6 +25,11 @@ const ListagemDeTestes = () => {
     const [loadingTestes, setLoadingTestes] = useState(false);
     const [visible, setVisible] = useState(false);
     const closeAlert = () => { setVisible(false); };
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleCollapse = () => {
+        setIsOpen(!isOpen);
+    };
 
     // Função para buscar todos os Grupos e SubGrupos
     const findAllGrupos = async () => {
@@ -252,9 +259,22 @@ const ListagemDeTestes = () => {
 
             {loadingTestes && <LoadingMenor />}
 
-            <button onClick={iniciarTestes} className="btn btn-success mt-2" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva}>
+            <button onClick={iniciarTestes} className="btn btn-success mt-2 space" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva}>
                 Iniciar Testes
             </button>
+
+            <button className="btn btn-success mt-2 space" disabled={!grupoSelecionado || !subGrupoSelecionado}
+                onClick={toggleCollapse}
+                aria-expanded={isOpen}
+                aria-controls="collapseExample">
+                Adicionar teste
+            </button>
+
+            {isOpen && <div className="card card-body mt-2">
+                <AddTestes
+                    grupoFiltro={grupoSelecionado}
+                    subGrupoFiltro={subGrupoSelecionado} />
+            </div>}
 
             {filteredItems.length > 0 && !loadingTestes ? (
                 <table className="table table-bordered mt-3">
@@ -309,11 +329,11 @@ const ListagemDeTestes = () => {
 
             {loading && <Loading />}
 
-            <button className="btn btn-danger mt-2" onClick={finalizarTestes} disabled={!sessaoAtiva}>
+            <button className="btn btn-danger mt-2 space" onClick={finalizarTestes} disabled={!sessaoAtiva}>
                 Finalizar Testes
             </button>
             <button className="btn btn-warning mt-2 space" onClick={resetarTestes}>Resetar Testes</button>
-            <button className="btn btn-success mt-2 PDF" onClick={enviarEmailComPDF}>Gerar PDF</button>
+            <button className="btn btn-success mt-2 space" onClick={enviarEmailComPDF}>Gerar PDF</button>
         </>
     );
 };

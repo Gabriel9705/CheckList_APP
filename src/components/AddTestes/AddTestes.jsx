@@ -2,14 +2,11 @@ import Cookies from 'js-cookie';
 import { useState, useEffect, useContext } from 'react';
 import { ErrorSpan } from '../../schema/ErrosStyled';
 import { postTeste } from '../../services/testes.service';
-import { getAllGrupos, getSubGrupoPorGrupo } from '../../services/grupos.service';
+import { getAllGrupos, getAllSubGrupos } from '../../services/grupos.service';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../../Context/UserContext';
-import { loggedUser } from '../../services/user.service';
 import Loading from '../Loading/Loading';
 
-const AddTestes = () => {
-  const { user } = useContext(UserContext);
+const AddTestes = ({grupoFiltro, subGrupoFiltro}) => {
   const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
   const [formValues, setFormValues] = useState({
     description: "",
@@ -35,12 +32,6 @@ const AddTestes = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formValues.grupo) {
-      newErrors.grupo = "O grupo é obrigatório.";
-    }
-    if (!formValues.subGrupo) {
-      newErrors.subGrupo = "O subgrupo é obrigatório.";
-    }
     if (!formValues.description) {
       newErrors.description = "A descrição é obrigatória.";
     }
@@ -60,8 +51,8 @@ const AddTestes = () => {
       try {
         setLoading(true);
         // Mapeia o ID para o nome do grupo e subgrupo
-        const grupoNome = grupos.find(grupo => grupo._id === formValues.grupo)?.nome;
-        const subGrupoNome = subGrupos.find(subGrupo => subGrupo.nome === formValues.subGrupo)?.nome;
+        const grupoNome = grupos.find(grupo => grupo._id === grupoFiltro)?.nome;
+        const subGrupoNome = subGrupos.find(subGrupo => subGrupo._id === subGrupoFiltro).nome;
 
         const testeData = {
           grupoNome: grupoNome, // Nome do grupo
@@ -86,8 +77,10 @@ const AddTestes = () => {
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
-        const response = await getAllGrupos(); // Endpoint para buscar grupos
-        setGrupos(response.data);
+        const responseG = await getAllGrupos(); // Endpoint para buscar grupos
+        const responseSG = await getAllSubGrupos(); // Endpoint para buscar grupos
+        setGrupos(responseG.data);
+        setSubGrupos(responseSG.data);
       } catch (error) {
         console.error("Erro ao buscar grupos:", error);
       }
@@ -96,80 +89,8 @@ const AddTestes = () => {
     fetchGrupos();
   }, []);
 
-  // Buscar subgrupos quando o grupo for selecionado
-  useEffect(() => {
-    if (formValues.grupo) {
-      const fetchSubGrupos = async () => {
-        try {
-          const response = await getSubGrupoPorGrupo(formValues.grupo); // Buscar subgrupos pelo grupo selecionado
-          setSubGrupos(response.data);
-        } catch (error) {
-          console.error("Erro ao buscar subgrupos:", error);
-        }
-      };
-
-      fetchSubGrupos();
-    } else {
-      setSubGrupos([]); // Limpar subgrupos se nenhum grupo estiver selecionado
-    }
-  }, [formValues.grupo]);
-
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-        <strong>Nome do Técnico:</strong>
-        <input
-          type="text"
-          className="form-control"
-          name="tecnico"
-          placeholder={user.name}
-          value={formValues.user}
-          onChange={handleInputChange}
-          disabled
-        />
-      </div>
-
-      {/* Dropdown para selecionar Grupo */}
-      <div className="form-group">
-        <label htmlFor='grupo'>Selecione um Grupo:</label>
-        <select
-          className="form-control"
-          id="grupo"
-          name="grupo"
-          value={formValues.grupo}
-          onChange={handleInputChange}
-        >
-          <option value="">Selecione um grupo</option>
-          {grupos.map((grupo) => (
-            <option key={grupo._id} value={grupo._id}>
-              {grupo.nome}
-            </option>
-          ))}
-        </select>
-      </div>
-      {errors.grupo && <ErrorSpan>{errors.grupo}</ErrorSpan>}
-
-      {/* Dropdown para selecionar SubGrupo */}
-      <div className="form-group">
-        <label htmlFor="subGrupo">Selecione um SubGrupo:</label>
-        <select
-          className="form-control"
-          id="subGrupo"
-          name="subGrupo"
-          value={formValues.subGrupo}
-          onChange={handleInputChange}
-          disabled={subGrupos.length === 0}
-        >
-          <option value="">{subGrupos.length === 0 ? "Nenhum subGrupo encontrado" : "Selecione um subgrupo..."}</option>
-          {subGrupos.map((subGrupo) => (
-            <option key={subGrupo._id} value={subGrupo.nome}>
-              {subGrupo.nome}
-            </option>
-          ))}
-        </select>
-      </div>
-      {errors.subGrupo && <ErrorSpan>{errors.subGrupo}</ErrorSpan>}
-
       <div className="form-group">
         <strong>Caso de uso:</strong>
         <input

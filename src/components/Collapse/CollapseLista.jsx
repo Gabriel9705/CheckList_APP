@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import HeaderCheckList from '../Forms/HeaderCheckList/HearderCheckList';
+import AddTestes from '../AddTestes/AddTestes';
 
 const CollapseExample = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +22,7 @@ const CollapseExample = () => {
 
             <div className={`collapse ${isOpen ? 'show' : ''}`} id="collapseExample">
                 <div className="card card-body mt-3">
-                    <HeaderCheckList />
+                   <AddTestes/>
                 </div>
             </div>
         </div>

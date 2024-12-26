@@ -7,7 +7,6 @@ const FormAddTeste = () => {
         <>
             <CadastroGrupo />
             <CadastroSubGrupo />
-            <AddTestes />
         </>
     )
 };
