@@ -41,7 +41,9 @@ const CadastroSubGrupo = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className='form-grupo'>
-                <label>Nome do SubGrupo:</label>
+                <strong style={{
+                    color: 'black'
+                }}>Nome do SubGrupo:</strong>
                 <input
                     type="text"
                     className='form-control'
@@ -52,7 +54,9 @@ const CadastroSubGrupo = () => {
                 />
             </div>
             <div className='form-grupo'>
-                <label>Grupo Associado:</label>
+                <strong style={{
+                    color: 'black'
+                }}>Grupo Associado:</strong>
                 <select
                     className='form-control'
                     value={grupoId}

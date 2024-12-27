@@ -3,13 +3,13 @@ import { useContext, useEffect, useState } from "react";
 import { deleteTeste, getAllListaTestes, updateTeste } from "../../services/testes.service";
 import { getAllGrupos, getAllSubGrupos } from "../../services/grupos.service";
 import { BarraDeProgresso } from "./ListagemDosTestesStyled";
-import { Link } from "react-router-dom";
 import { UserContext } from "../../Context/UserContext";
 import { finalizarSessao, iniciarSessao } from "../../services/session.service";
 import Loading from "../Loading/Loading";
 import LoadingMenor from "../Loading/LoadingMenor";
-import CollapseExample from "../Collapse/CollapseLista";
 import AddTestes from "../AddTestes/AddTestes";
+import ModalExemple from "../Modal/Modal";
+
 
 const ListagemDeTestes = () => {
     const { user } = useContext(UserContext);
@@ -209,7 +209,7 @@ const ListagemDeTestes = () => {
 
     return (
         <>
-            <div className="container mt-4">
+            <div className="container mt-4 ">
 
                 <label className="form-label"> <strong>Grupo:</strong></label>
                 <select className="form-select" value={grupoSelecionado}
@@ -234,9 +234,7 @@ const ListagemDeTestes = () => {
                 </select>
             </div>
 
-            <Link to="/add_testes">
-                <button className="btn btn-warning mt-2">Adicionar Novos testes</button>
-            </Link>
+            <ModalExemple />
 
             <div className="mt-4">
                 <h3>Progresso dos Testes</h3>
@@ -259,7 +257,7 @@ const ListagemDeTestes = () => {
 
             {loadingTestes && <LoadingMenor />}
 
-            <button onClick={iniciarTestes} className="btn btn-success mt-2 space" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva}>
+            <button onClick={iniciarTestes} className="btn btn-success mt-2 space" disabled={!grupoSelecionado || !subGrupoSelecionado || sessaoAtiva || !filteredItems.length}>
                 Iniciar Testes
             </button>
 

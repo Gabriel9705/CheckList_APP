@@ -6,7 +6,7 @@ import { getAllGrupos, getAllSubGrupos } from '../../services/grupos.service';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../Loading/Loading';
 
-const AddTestes = ({grupoFiltro, subGrupoFiltro}) => {
+const AddTestes = ({ grupoFiltro, subGrupoFiltro }) => {
   const [filtros, setFiltros] = useState({ grupo: "", subGrupo: "" });
   const [formValues, setFormValues] = useState({
     description: "",
@@ -67,7 +67,7 @@ const AddTestes = ({grupoFiltro, subGrupoFiltro}) => {
         setFormValues({ grupo: "", subGrupo: "", description: "" }); // Resetar o formulário
       } catch (error) {
         console.error("Erro ao enviar os dados:", error);
-      } finally{
+      } finally {
         setLoading(false)
       }
     }
@@ -92,7 +92,9 @@ const AddTestes = ({grupoFiltro, subGrupoFiltro}) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
-        <strong>Caso de uso:</strong>
+        <strong style={{
+          color: 'black'
+        }}>Caso de uso:</strong>
         <input
           type="text"
           className="form-control"

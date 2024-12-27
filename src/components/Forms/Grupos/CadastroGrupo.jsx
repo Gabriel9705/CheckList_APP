@@ -25,7 +25,9 @@ const CadastroGrupo = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className='form-grupo'>
-                <label>Nome do Grupo:</label>
+                <strong style={{
+                    color: 'black'
+                }}>Nome do Grupo:</strong>
                 <input
                     type="text"
                     className='form-control'
